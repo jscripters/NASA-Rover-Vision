@@ -2,8 +2,9 @@ let axios = require("axios");
 let express = require("express");
 let app = express();
 let apiFile = require("../env.json");
-let apiKey = apiFile["api_key"]; 
-let baseUrl = apiFile["api_url"]; 
+let apiKey = apiFile["api_key"];
+let baseUrl = apiFile["api_url"];
+let join = require('node:path');
 let port = 3000;
 let hostname = "localhost";
 app.use(express.static("public"));
@@ -23,6 +24,10 @@ app.get("/getPhotos", (req, res) => {
     res.status(errorCode).json({"error":error.response.data.message});
   });
   console.log(`Sending request to: ${url}`);
+});
+
+app.get('/', (req, res) => {
+  res.sendFile(join(__dirname, 'index.html'));
 });
 
 app.listen(port, hostname, () => {

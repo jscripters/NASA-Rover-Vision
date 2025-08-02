@@ -1,0 +1,28 @@
+<html>
+  <head>
+    <title>Add a Map using HTML</title>
+
+    <link rel="stylesheet" type="text/css" href="./style.css" />
+    <script type="module" src="./earthCam.js"></script>
+  </head>
+  <body>
+    <gmp-map
+      id = "map"
+      center="38.7946,-106.5348"
+      zoom="4"
+      map-id="DEMO_MAP_ID"
+      style="height: 400px"
+    >
+    </gmp-map>
+    <div id="pano"></div>
+
+    <!--
+      The `defer` attribute causes the script to execute after the full HTML
+      document has been parsed. -->
+    <script
+      src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyCcMh3p_luXHjb3yARg3rzZ7Kzgos0q4ig&callback=initialize&v=weekly"
+      defer
+    ></script>
+    <!-- <script src="earthCam.js"></script> -->
+  </body>
+</html>

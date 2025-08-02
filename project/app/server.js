@@ -7,6 +7,7 @@ let baseUrl = apiFile["api_url"];
 let port = 3000;
 let hostname = "localhost";
 app.use(express.static("public"));
+app.use(express.json());
 
 app.get("/", (req, res) => {
   console.log("Sending login.html");

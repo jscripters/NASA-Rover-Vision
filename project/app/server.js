@@ -30,6 +30,32 @@ app.get("/getPhotos", (req, res) => {
   console.log(`Sending request to: ${url}`);
 });
 
+
+let users = {}; //TODO: Replace with a proper database 
+app.post("/createAccount", (req, res) => {
+  const { username, password } = req.body;
+  if (!username || !password) {
+    return res.status(400).json({ error: "Username and password required." });
+  }
+  if (users[username]) {
+    return res.status(409).json({ error: "Username already exists." });
+  }
+  users[username] = { password };
+  res.json({ message: "Account created successfully." });
+});
+
+app.post("/login", (req, res) => {
+  const { username, password } = req.body;
+  if (!username || !password) {
+    return res.status(400).json({ error: "Username and password required." });
+  }
+  if (!users[username] || users[username].password !== password) {
+    return res.status(401).json({ error: "Invalid credentials." });
+  }
+  res.json({ message: "Login successful." });
+});
+
+
 app.listen(port, hostname, () => {
   console.log(`http://${hostname}:${port}`);
 });

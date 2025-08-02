@@ -4,5 +4,21 @@ let pwd = document.getElementById("password").value;
 button.addEventListener("click", login);
 
 function login(){
-    return;
+    fetch('/login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            username: usn,
+            password: pwd
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+    })
+    .catch(error => {
+        console.error(error);
+    });
 }

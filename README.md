@@ -1,12 +1,9 @@
 get a api key from https://api.nasa.gov/ 
 
-make sure env.json is:
-{
-	"api_key": "DEMO_KEY",
-	"api_url": "https://api.nasa.gov/mars-photos/api/v1/"
-}
+1. Make sure run "npm run setup" before start! It will generate the demo env for user.
 
-start server.js
+2. run "npm run start" start test
+------------------------------------------------------------------------
 
 input the information you want to look at solday, rover and etc
 

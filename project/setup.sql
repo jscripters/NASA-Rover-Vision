@@ -1,7 +1,5 @@
-CREATE DATABASE accounts;
-\c accounts
-CREATE TABLE PSW (
+CREATE TABLE IF NOT EXISTS users (
 	id SERIAL PRIMARY KEY,
-	username VARCHAR(20),
-	passwords VARCHAR(20),
+	username VARCHAR(20) UNIQUE NOT NULL,
+	passwords VARCHAR(20) NOT NULL
 );

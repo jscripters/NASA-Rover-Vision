@@ -1,12 +1,20 @@
 let axios = require("axios");
-let express = require("express");
-let app = express();
 let apiFile = require("../env.json");
 let apiKey = apiFile["api_key"];
 let baseUrl = apiFile["api_url"];
-let join = require('node:path');
+const path = require('path');
 let port = 3000;
 let hostname = "localhost";
+
+
+let express = require("express");
+const { createServer } = require("node:http");
+const { setupSocket } = require("./socket/socket.js");
+
+const app = express();
+const server = createServer(app);
+setupSocket(server);
+
 app.use(express.static("public"));
 
 app.get("/getPhotos", (req, res) => {
@@ -27,10 +35,10 @@ app.get("/getPhotos", (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  res.sendFile(join(__dirname, 'index.html'));
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-app.listen(port, hostname, () => {
+server.listen(port, hostname, () => {
   console.log(`http://${hostname}:${port}`);
 });
 

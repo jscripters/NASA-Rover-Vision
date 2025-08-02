@@ -1,14 +1,12 @@
-let createServer = require('node:http');
-let  Server = require('socket.io');
-const sqlite3 = require('sqlite3');
-const open = require('sqlite');
+const { Server } = require("socket.io")
+const sqlite3 = require('sqlite3').verbose();
+const { open } = require('sqlite');
 
-const server = createServer(app);
-const io = new Server(server, {
-  connectionStateRecovery: {}
-});
+async function setupSocket(server) {
 
-async function setupSocket() {
+  const io = new Server(server, {
+    connectionStateRecovery: {}
+  });
   // open the database file
   const db = await open({
       filename: 'chat.db',
@@ -18,8 +16,9 @@ async function setupSocket() {
   await db.exec(`
     CREATE TABLE IF NOT EXISTS messages (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT,
         client_offset TEXT UNIQUE,
-        content TEXT
+        content TEXT,
         timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
     );
   `);
@@ -36,7 +35,7 @@ async function setupSocket() {
         );
 
         recentMessages.forEach(row => {
-          socket.emit('chat message', row.content, row.id);
+          socket.emit('chat message', row.username, row.content, row.id);
         });
 
       } catch (e) {
@@ -45,19 +44,20 @@ async function setupSocket() {
       }
     }
 
-    socket.on('chat message', async (msg, client_offset, timeStamp, callback) => {
+    socket.on('chat message', async (username, msg, client_offset, timeStamp, callback) => {
       let result;
       try {
-        result = await db.run('INSERT INTO messages (content, client_offset) VALUES (?)', msg, client_offset, timeStamp);
+        result = await db.run('INSERT INTO messages (username, content, client_offset, timestamp) VALUES (?, ?, ?, ?)', username, msg, client_offset, timeStamp);
       } catch (e) {
         if (e.errno === 19) {
           callback({ success: false, error: err.message });
         } else {
+          console.error(e);
           callback({ success: false, error: 'An error occurred' });
         }
         return;
       }
-      io.emit('chat message', msg, result.lastID);
+      io.emit('chat message', username, msg, result.lastID);
       callback({ success: true });
     });
 

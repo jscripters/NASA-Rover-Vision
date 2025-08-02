@@ -7,40 +7,60 @@ const socket = io({
   retries: 3,
 });
 
-const form = document.getElementById('form');
-const input = document.getElementById('input');
-// const messages = document.getElementById('messages');
 
 let counter = 0;
 
-form.addEventListener('submit', (e) => {
-  e.preventDefault(); // Prevent page reload on form submit
-  if (input.value) {
-    const clientOffset = `${socket.id}-${counter++}`;
-    const timeStamp = new Date().toISOString();
-    socket.emit('chat message', input.value, clientOffset, timeStamp, acknowledgementCallback);
-    input.value = '';
-  }
-});
+const hexToRgb = hex =>
+  hex.replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i
+             ,(m, r, g, b) => '#' + r + r + g + g + b + b)
+    .substring(1).match(/.{2}/g)
+    .map(x => parseInt(x, 16))
 
-socket.on('chat message', (msg, serverOffset) => {
-  const chatItem = document.createElement('div');
-  chatItem.classList.add('chat__item');
+window.onload = function init(){
+  initEventListeners();
+}
 
-  const chatUser = document.createElement('div');
-  chatUser.classList.add('chat__user');
-  chatUser.textContent = `${socket.id}:`;
-  chatItem.appendChild(chatUser);
+function initEventListeners() {
+  const form = document.getElementById('form');
+  const input = document.getElementById('input');
+  const chatWidget = document.querySelector('.chat-widget');
 
-  // chatItem.innerHTML = `<p>${msg}</p>`;
-  // messages.appendChild(chatItem);
+  form.addEventListener('submit', (e) => {
+    e.preventDefault(); // Prevent page reload on form submit
+    if (input.value) {
+      const clientOffset = `${socket.id}-${counter++}`;
+      const timeStamp = new Date().toISOString();
+      socket.emit('chat message', socket.id, input.value, clientOffset, timeStamp, acknowledgementCallback);
+      input.value = '';
+    }
+  });
 
-  const item = document.createElement('li');
-  item.textContent = msg;
-  messages.appendChild(item);
-  window.scrollTo(0, document.body.scrollHeight);
-  socket.auth.serverOffset = serverOffset;
-});
+  socket.on('chat message', (user, msg, serverOffset) => {
+    console.log("user:",user);
+    console.log("msg:",msg);
+    const chatItem = document.createElement('div');
+    chatItem.classList.add('chat__item');
+
+    const chatUser = document.createElement('span');
+    chatUser.classList.add('chat__user');
+    chatUser.textContent = `${user}:`;
+    chatItem.appendChild(chatUser);
+
+    const chatMessage = document.createElement('span');
+    chatMessage.classList.add('chat__message');
+    chatMessage.textContent = msg;
+    chatItem.appendChild(chatMessage);
+
+    chatItem.style.setProperty('--user-color', user.toHex());
+    chatItem.style.setProperty('--user-color-rgb', hexToRgb(user.toHex()));
+    chatItem.appendChild(chatMessage);
+
+    chatWidget.appendChild(chatItem);
+
+    window.scrollTo(0, document.body.scrollHeight);
+    socket.auth.serverOffset = serverOffset;
+  });
+}
 
 function acknowledgementCallback(ack) {
   if (ack && ack.success) {
@@ -50,11 +70,11 @@ function acknowledgementCallback(ack) {
   }
 }
 
-String.prototype.toRGB = function() {
+String.prototype.toHex = function() {
   let hash = 0;
-  if (id.length === 0)
+  if (this.length === 0)
     return hash;
-  for (let i = 0; i < id.length; i++) {
+  for (let i = 0; i < this.length; i++) {
     hash = this.charCodeAt(i) + ((hash << 5) - hash);
     hash = hash & hash;
   }
@@ -63,5 +83,5 @@ String.prototype.toRGB = function() {
     let value = (hash >> (i * 8)) & 0xFF;
     color += ('00' + value.toString(16)).substr(-2);
   }
-  return hash;
+  return color;
 }

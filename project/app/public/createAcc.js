@@ -1,9 +1,12 @@
 let button = document.getElementById("submit");
-let usn = document.getElementById("username").value;
-let pwd = document.getElementById("password").value;
+
 button.addEventListener("click", createAcc);
 
 function createAcc() {
+
+    let usn = document.getElementById("username").value;
+    let pwd = document.getElementById("password").value;
+
     fetch('/createAccount', {
         method: 'POST',
         headers: {

@@ -8,6 +8,11 @@ let port = 3000;
 let hostname = "localhost";
 app.use(express.static("public"));
 
+app.get("/", (req, res) => {
+  console.log("Sending login.html");
+  res.sendFile("public/login.html", { root: __dirname });
+});
+
 app.get("/getPhotos", (req, res) => {
   let rover = req.query.rover;
   let solDay = req.query.solday;
@@ -18,9 +23,9 @@ app.get("/getPhotos", (req, res) => {
     //console.log("Received response:", response.data);
     res.json(response.data);
   }).catch(error => {
-    console.log(error.response.data);
-    let errorCode = parseInt(error.response.data.cod);
-    res.status(errorCode).json({"error":error.response.data.message});
+    console.log(error.message);
+    let errorCode = parseInt(error.code);
+    res.status(errorCode).json({"error":error.message});
   });
   console.log(`Sending request to: ${url}`);
 });

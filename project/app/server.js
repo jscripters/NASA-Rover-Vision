@@ -16,7 +16,8 @@ app.get("/", (req, res) => {
 app.get("/getPhotos", (req, res) => {
   let rover = req.query.rover;
   let solDay = req.query.solday;
-  let camera = "navcam"
+  const camera = req.query.camera || "navcam";
+  
   //console.log(rover,solDay,apiKey)
   let url = `${baseUrl}rovers/${rover}/photos?sol=${solDay}&camera=${camera}&api_key=${apiKey}`;
   axios.get(url).then((response) => {
@@ -29,6 +30,8 @@ app.get("/getPhotos", (req, res) => {
   });
   console.log(`Sending request to: ${url}`);
 });
+
+
 
 app.listen(port, hostname, () => {
   console.log(`http://${hostname}:${port}`);

@@ -2,25 +2,64 @@
 <html>
 <head>
 	<meta charset="utf-8">
-	<title>camera</title>
+	<title>Nasa Rover Vision</title>
 	<link rel="stylesheet" type="text/css" href="style.css">
+	<style>
+		Body{
+			background-color: rgb(60, 60, 60);
+		}
+		.banner{
+			background-color: rgb(11, 61, 145);
+			margin: 0;
+			height: 50px;
+  			width: 120%;
+			padding: 10px 16px;
+		}
+		.recommendations{
+			width:100px;
+			background-color: rgb(31, 30, 30);
+			padding-left: 15px;
+			border: 2px solid rgb(255, 255, 255); 
+			height: 200px;
+			overflow: auto;
+
+		}
+
+	</style>
+
 </head>
 <body>
 
-<h1>Nasa Rover Vision</h1>
+<h1 class = "banner" style="color: white;">Nasa Rover Vision</h1>
 
-<div id ="input">
+<div class="recommendations" style = "float: right; color: white;" >    
+	<p id="rovername"></p>
+	<div id="add"></div>
+</div>
+
+<div id ="input" style="color: white;">
 	<div>
-		<label for="day">pick sol day</label>
-		<input id="day" type="text" name="password">
+		<label for="day">Sol day</label>
+		<input id="day" type="text" name="day">
 	</div>
     <div>
-		<label for="rover">rover:</label>
+		<label for="rover">Rover:</label>
 		<select id="rover" name="rover">
 			<option value="">Please select a rover</option>
 			<option value="curiosity">Curiosity</option>
 			<option value="opportunity">Opportunity</option>
 			<option value="spirit">Spirit</option>
+			<option value="perseverance">Perseverance</option>
+		</select>
+	</div>
+	<div id = "all cameras">
+		<label for="camera">Available Cameras:</label>
+		<select id="camera" name="camera">
+			<option value="">Please select camera</option>
+			<option value="navcam">Navigation Camera</option>
+			<option value="fhaz">Front Hazard Avoidance Camera</option>
+			<option value="rhaz">Rear Hazard Avoidance Camera</option>
+			<option value="mast">Mast Camera</option>
 		</select>
 	</div>
 	<button id="submit">submit</button>

@@ -34,8 +34,6 @@ app.get("/getPhotos", (req, res) => {
   console.log(`Sending request to: ${url}`);
 });
 
-
-let users = {}; //TODO: Replace with a proper database 
 app.post("/createAccount", async (req, res) => {
 
   const { username, password } = req.body;

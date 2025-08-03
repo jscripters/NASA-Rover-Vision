@@ -20,7 +20,11 @@ function createAcc() {
     .then(response => response.json())
     .then(data => {
         console.log(data);
-        
+        if (data.message === "Account created successfully.") {
+            window.location.href = "roverCam.html";
+        } else {
+            alert ("Account creation failed: " + (data.error || "Unknown error"));
+        }
     })
     .catch(error => {
         console.error(error);

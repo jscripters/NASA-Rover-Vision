@@ -17,6 +17,11 @@ function login(){
     .then(response => response.json())
     .then(data => {
         console.log(data);
+        if (data.message === "Login successful") {
+            window.location.href = "roverCam.html";
+        } else {
+            alert("Login failed: " + (data.error || "Unknown error"));
+        }
     })
     .catch(error => {
         console.error(error);

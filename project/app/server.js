@@ -34,8 +34,8 @@ app.get("/getPhotos", (req, res) => {
   console.log(`Sending request to: ${url}`);
 });
 
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+app.get('/chat', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/chat.html'));
 });
 
 server.listen(port, hostname, () => {

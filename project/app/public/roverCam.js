@@ -104,7 +104,7 @@ const roverInput = document.getElementById("rover");
 let roverName = document.getElementById("rovername");
 roverInput.addEventListener('change', () => {
   recContainer.textContent = "";
-  roverName.textContent = roverInput.value;
+  roverName.textContent = roverInput.value.charAt(0).toUpperCase() + roverInput.value.slice(1) + " Available Sol Days";
   getManifest(avaliableCams, roverInput.value);
 });
 

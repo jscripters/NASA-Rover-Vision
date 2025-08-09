@@ -38,10 +38,6 @@
 </div>
 
 <div id ="input" style="color: white;">
-	<div>
-		<label for="day">Sol day</label>
-		<input id="day" type="text" name="day">
-	</div>
     <div>
 		<label for="rover">Rover:</label>
 		<select id="rover" name="rover">
@@ -52,15 +48,14 @@
 			<option value="perseverance">Perseverance</option>
 		</select>
 	</div>
+	<div id="dayInput">
+		<label>Sol day</label>
+		<input id="day" type="text" name="day">
+	</div>
+	<button id="getCams">Get available cameras</button>
 	<div id = "all cameras">
-		<label for="camera">Available Cameras:</label>
-		<select id="camera" name="camera">
-			<option value="">Please select camera</option>
-			<option value="navcam">Navigation Camera</option>
-			<option value="fhaz">Front Hazard Avoidance Camera</option>
-			<option value="rhaz">Rear Hazard Avoidance Camera</option>
-			<option value="mast">Mast Camera</option>
-		</select>
+		<label>Available Cameras:</label>
+		<select id="camera" name="camera"></select>
 	</div>
 	<button id="submit">submit</button>
 </div>
@@ -70,7 +65,7 @@
     <button id="previous">prev</button>
     <button id="next">next</button>
     <button id="timelapse">timelapse</button>
-	 <button id="pause">pause</button>
+	<button id="pause">pause</button>
 </div>
 
 <script src="roverCam.js"></script>

@@ -4,33 +4,39 @@ let nextButton = document.getElementById("next");
 let prevButton = document.getElementById("previous");
 let timelapseButton = document.getElementById("timelapse");
 let pauseButton = document.getElementById("pause");
+let cameraOptions = document.getElementById("camera");
 
 let recContainer = document.getElementById("add");
-function setRecTable(array){
-    for(let i = 0;i < array.length;i++){
-        let addSolDay = document.createElement("p");
-        addSolDay.textContent = array[i]
-        //console.log(array[i])
-        recContainer.appendChild(addSolDay)
-    }
+function addDayToRecTable(day){
+    let addSolDay = document.createElement("p");
+    addSolDay.textContent = day
+    recContainer.appendChild(addSolDay)
 }
 
+function addCamera(camArr){
+    for(let i=0;i< camArr.length;i++){
+        let camEntry = document.createElement("option");
+        camEntry.value = camArr[i]
+        camEntry.textContent = camArr[i]
+        cameraOptions.appendChild(camEntry)
+    }
 
-function getManifest(recArr,rover){
+}
+
+function getManifest(camArr,rover){
     let url = `/getManifest?rover=${rover}`;
     fetch(url).then((response) => {
         return response.json();
     })
     .then((body) => {
-        //console.log("body:",body.length);
+        //console.log("body:",body);
         let manifestLen = body.length
         for(let i = 0; i< manifestLen;i++){
             if(body[i].total_photos >= 300){
-                recArr.push(body[i].sol)
+                addDayToRecTable(body[i].sol)
             }
+            camArr.push(body[i].cameras)
         }
-        console.log(recArr)
-        setRecTable(recArr)
     }).catch(error=> {
         console.log(error);
     }
@@ -80,15 +86,14 @@ function submit(srcArr){
     let dayInput = document.getElementById("day").value;
     let roverInput = document.getElementById("rover").value;
     let cameraInput = document.getElementById("camera").value;
-    console.log(dayInput);
-    console.log(roverInput);
-    console.log(cameraInput);
+    //console.log(dayInput);
+    //console.log(roverInput);
+    //console.log(cameraInput);
     let url = `/getPhotos?solday=${dayInput}&camera=${cameraInput}&rover=${roverInput}`;
     fetch(url).then((response) => {
         return response.json();
     })
     .then((body) => {
-        //console.log("body:",body);
         let maxLen = body.photos.length;
 
         for(let i = 0; i< maxLen;i++){
@@ -121,17 +126,34 @@ function prevButtonClicked(){
     
 }
 
+let avaliableCams=[];
 const roverInput =document.getElementById("rover");
 let roverName =document.getElementById("rovername");
 roverInput.addEventListener('change', (event) => {
-    let reccomendations = []
     recContainer.textContent="";
-    //console.log(roverInput.value);
     roverName.textContent = roverInput.value;
-    getManifest(reccomendations,roverInput.value)}
-);
+    getManifest(avaliableCams,roverInput.value)
+});
 
-let photosArr = []
+let getCams=document.getElementById("getCams");
+
+getCams.addEventListener("click",(event)=> {
+    cameraOptions.textContent="";
+    let defaultOption = document.createElement("option");
+    defaultOption.value = "";
+    defaultOption.textContent = "Please choose camera"
+    cameraOptions.appendChild(defaultOption);
+    let dayInput = document.getElementById("day").value;
+    if(dayInput !="" && roverInput.value!=""){
+        console.log("cameras aval:",avaliableCams[dayInput])
+        addCamera(avaliableCams[dayInput]);
+    }
+    else{
+        console.log("Error: input day and rover")
+    }
+})
+
+let photosArr = [];
 let firstClick = true;
 function submitClick(){
     if(!firstClick){

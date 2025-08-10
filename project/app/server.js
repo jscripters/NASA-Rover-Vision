@@ -1,5 +1,6 @@
 let axios = require("axios");
 let express = require("express");
+let bcrypt = require('bcrypt');
 let app = express();
 let apiFile = require("../env.json");
 let { Pool } = require("pg");
@@ -57,6 +58,8 @@ app.post("/createAccount", async (req, res) => {
     return res.status(400).json({ error: "Username and password required." });
   }
 
+  const hashedPassword = await bcrypt.hash(password, 10);
+
   try {
     let result = await pool.query(
       "INSERT INTO users (username, passwords) VALUES ($1, $2) RETURNING id",
@@ -74,25 +77,23 @@ app.post("/createAccount", async (req, res) => {
 });
 
 app.post("/login", async (req, res) => {
-  const { username, password } = req.body;
-  if (!username || !password) {
-    return res.status(400).json({ error: "Username and password required." });
-  }
-  
   try {
-    const result = await pool.query(
-      "SELECT * FROM users WHERE username = $1 AND passwords = $2",
-      [username, password]
+    const { username, password } = req.body;
+
+    const [user] = await db.query(
+      'SELECT * FROM users WHERE username = ?',
+      [username]
     );
 
-    if (result.rows.length === 0) {
-      res.status(401).json({ error: "Invalid credentials." });
-    } else {
-      res.json({ message: "Login successful." });
-    }
+    if (!user) return res.status(401).json({ error: 'Invalid username or password' });
+
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) return res.status(401).json({ error: 'Invalid username or password' });
+
+    res.json({ message: 'Login successful' });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal server error." });
+    res.status(500).json({ error: 'Login failed.' });
   }
 });
 

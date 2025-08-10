@@ -25,7 +25,7 @@ app.get("/getManifest", (req, res) => {
     res.json(response.data.photo_manifest.photos);
   }).catch(error => {
     console.log(error.message);
-    let errorCode = parseInt(error.code);
+    let errorCode = parseInt(error.status);
     res.status(errorCode).json({"error":error.message});
   });
   console.log(`Sending request to: ${url}`);
@@ -43,7 +43,7 @@ app.get("/getPhotos", (req, res) => {
     res.json(response.data);
   }).catch(error => {
     console.log(error.message);
-    let errorCode = parseInt(error.code);
+    let errorCode = parseInt(error.status);
     res.status(errorCode).json({"error":error.message});
   });
   console.log(`Sending request to: ${url}`);

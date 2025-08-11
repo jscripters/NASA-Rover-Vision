@@ -11,7 +11,16 @@ let baseUrl = apiFile["api_url"];
 let port = 3000;
 let hostname = "localhost";
 app.use(express.static("public"));
+// possible change to protect the other files before login
+// app.use('/assets', express.static('public/assets'));
 app.use(express.json());
+
+function ensureLoggedIn(req, res, next) {
+  if (req.session.userId) {
+    return next();
+  }
+  res.redirect('/login.html');
+}
 
 app.use(session({
   secret: 'jscripters2025',
@@ -58,6 +67,10 @@ app.get("/getPhotos", (req, res) => {
   console.log(`Sending request to: ${url}`);
 });
 
+app.get('/roverCam.html', ensureLoggedIn, (req, res) => {
+  res.sendFile("public/roverCam.html", { root: __dirname });
+});
+
 app.post("/createAccount", async (req, res) => {
 
   const { username, password } = req.body;
@@ -88,7 +101,7 @@ app.post("/login", async (req, res) => {
     const { username, password } = req.body;
 
     const result = await pool.query(
-      'SELECT * FROM users WHERE username = ?',
+      'SELECT * FROM users WHERE username = $1',
       [username]
     );
 

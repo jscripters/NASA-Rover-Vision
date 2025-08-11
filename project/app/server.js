@@ -46,7 +46,7 @@ app.get("/getManifest", (req, res) => {
     let errorCode = parseInt(error.status);
     res.status(errorCode).json({"error":error.message});
   });
-  console.log(`Sending request to: ${url}`);
+  console.log(`Sending request to: ${baseUrl}manifests/${rover}`);
 });
 
 app.get("/getPhotos", (req, res) => {
@@ -64,7 +64,7 @@ app.get("/getPhotos", (req, res) => {
     let errorCode = parseInt(error.status);
     res.status(errorCode).json({"error":error.message});
   });
-  console.log(`Sending request to: ${url}`);
+  console.log(`Sending request to: ${baseUrl}rovers/${rover}/photos?sol=${solDay}&camera=${camera}`);
 });
 
 app.get('/roverCam.html', ensureLoggedIn, (req, res) => {

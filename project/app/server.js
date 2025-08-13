@@ -11,16 +11,7 @@ let baseUrl = apiFile["api_url"];
 let port = 3000;
 let hostname = "localhost";
 app.use(express.static("public"));
-// possible change to protect the other files before login
-// app.use('/assets', express.static('public/assets'));
 app.use(express.json());
-
-function ensureLoggedIn(req, res, next) {
-  if (req.session.userId) {
-    return next();
-  }
-  res.redirect('/login.html');
-}
 
 app.use(session({
   secret: 'jscripters2025',
@@ -67,10 +58,6 @@ app.get("/getPhotos", (req, res) => {
   console.log(`Sending request to: ${baseUrl}rovers/${rover}/photos?sol=${solDay}&camera=${camera}`);
 });
 
-app.get('/roverCam.html', ensureLoggedIn, (req, res) => {
-  res.sendFile("public/roverCam.html", { root: __dirname });
-});
-
 app.post("/createAccount", async (req, res) => {
 
   const { username, password } = req.body;
@@ -114,6 +101,8 @@ app.post("/login", async (req, res) => {
 
     req.session.userId = user.id;
     req.session.username = user.username;
+    console.log(req.session.userId);
+    console.log(req.session.username);
 
     res.json({ message: 'Login successful' });
   } catch (error) {

@@ -11,11 +11,11 @@
     #photos {
       position: fixed;
       inset: 0;
-      background-image: url('images/c15xfo3zgt581.png'); 
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      z-index: 0;
+      width: 100vw; 
+      height: 100vh; 
+      object-fit: cover; 
+      /*display: block; /* Remove extra space below image */
+      z-index: 1;
     }
 
     /* Top banner */
@@ -43,7 +43,22 @@
       padding: 12px 14px;
       border: 1px solid rgba(255,255,255,0.25);
       border-radius: 12px;
-      height: calc(100vh - 76px - 24px);
+      height: calc((100vh/2) - 76px - 24px);
+      overflow: auto;
+      z-index: 2;
+    }
+
+    .msg {
+      position: fixed;
+      top: 500px;
+      right: 16px;
+      width: 240px;
+      background: rgba(31, 30, 30, 0.8);
+      color: #fff;
+      padding: 12px 14px;
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 12px;
+      height: calc((100vh/6) - 76px - 24px);
       overflow: auto;
       z-index: 2;
     }
@@ -113,6 +128,10 @@
     <div id="add"></div>
   </div>
 
+  <div class="msg">
+    <p id="errors"></p>
+  </div>
+
   <div id="input">
     <label for="rover">Rover:</label>
     <select id="rover" name="rover">
@@ -134,7 +153,7 @@
     <button id="submit">submit</button>
   </div>
 
-  <div id="photos"></div>
+  <img id="photos" src='images/c15xfo3zgt581.png'>
 
   <div id="controls">
     <button id="previous">prev</button>

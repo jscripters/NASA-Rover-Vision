@@ -101,10 +101,8 @@ app.post("/login", async (req, res) => {
 
     req.session.userId = user.id;
     req.session.username = user.username;
-    console.log(req.session.userId);
-    console.log(req.session.username);
 
-    res.json({ message: 'Login successful' });
+    res.json({ message: 'Login successful.' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Login failed.' });

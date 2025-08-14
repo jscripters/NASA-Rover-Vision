@@ -1,39 +1,167 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="utf-8">
-	<title>camera</title>
-	<link rel="stylesheet" type="text/css" href="style.css">
+  <meta charset="utf-8">
+  <title>Nasa Rover Vision</title>
+  <style>
+    html, body { margin: 0; padding: 0; height: 100%; }
+    body { background-color: #000; overflow-x: hidden; font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
+
+    /* Fullscreen background behind everything */
+    #photos {
+      position: fixed;
+      inset: 0;
+      width: 100vw; 
+      height: 100vh; 
+      object-fit: cover; 
+      /*display: block; /* Remove extra space below image */
+      z-index: 1;
+    }
+
+    /* Top banner */
+    .banner {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 60px;
+      margin: 0;
+      background-color: rgb(11, 61, 145);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      z-index: 2;
+    }
+
+    /* Right panel */
+    .recommendations {
+      position: fixed;
+      top: 76px;
+      right: 16px;
+      width: 240px;
+      background: rgba(31, 30, 30, 0.8);
+      color: #fff;
+      padding: 12px 14px;
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 12px;
+      height: calc((100vh/2) - 76px - 24px);
+      overflow: auto;
+      z-index: 2;
+    }
+
+    .msg {
+      position: fixed;
+      top: 500px;
+      right: 16px;
+      width: 240px;
+      background: rgba(31, 30, 30, 0.8);
+      color: #fff;
+      padding: 12px 14px;
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 12px;
+      height: calc((100vh/6) - 76px - 24px);
+      overflow: auto;
+      z-index: 2;
+    }
+
+    /* Form overlay */
+    #input {
+      position: fixed;
+      top: 76px;
+      left: 16px;
+      right: 292px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px 14px;
+      align-items: center;
+      color: #fff;
+      background: rgba(0,0,0,0.45);
+      backdrop-filter: blur(4px);
+      padding: 12px 16px;
+      border-radius: 12px;
+      z-index: 2;
+    }
+
+    #input label { margin-right: 4px; white-space: nowrap; }
+
+    #input input,
+    #input select,
+    #input button {
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.35);
+      background: rgba(0,0,0,0.35);
+      color: #fff;
+    }
+
+    /* Bottom-left playback controls */
+    #controls {
+      position: fixed;
+      left: 16px;
+      bottom: 16px;
+      display: flex;
+      gap: 10px;
+      background: rgba(0,0,0,0.45);
+      backdrop-filter: blur(4px);
+      padding: 10px 12px;
+      border-radius: 12px;
+      z-index: 2;
+    }
+
+    #controls button {
+      padding: 20px 40px;
+      font-size: 18px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.35);
+      background: rgba(0,0,0,0.35);
+      color: #fff;
+      cursor: pointer;
+    }
+    #controls button:hover { background: rgba(255,255,255,0.1); }
+  </style>
 </head>
 <body>
 
-<h1>Nasa Rover Vision</h1>
+  <h1 class="banner">NASA Rover Vision</h1>
 
-<div id ="input">
-	<div>
-		<label for="day">pick sol day</label>
-		<input id="day" type="text" name="password">
-	</div>
-    <div>
-		<label for="rover">rover:</label>
-		<select id="rover" name="rover">
-			<option value="">Please select a rover</option>
-			<option value="curiosity">Curiosity</option>
-			<option value="opportunity">Opportunity</option>
-			<option value="spirit">Spirit</option>
-		</select>
-	</div>
-	<button id="submit">submit</button>
-</div>
+  <div class="recommendations">
+    <p id="rovername"></p>
+    <div id="add"></div>
+  </div>
 
-<img id="photos" src="">
-<div>
+  <div class="msg">
+    <p id="errors"></p>
+  </div>
+
+  <div id="input">
+    <label for="rover">Rover:</label>
+    <select id="rover" name="rover">
+      <option value="">Please select a rover</option>
+      <option value="curiosity">Curiosity</option>
+      <option value="opportunity">Opportunity</option>
+      <option value="spirit">Spirit</option>
+      <option value="perseverance">Perseverance</option>
+    </select>
+
+    <label for="day">Sol day</label>
+    <input id="day" type="text" name="day">
+
+    <button id="getCams">Get available cameras</button>
+
+    <label for="camera">Available Cameras:</label>
+    <select id="camera" name="camera"></select>
+
+    <button id="submit">submit</button>
+  </div>
+
+  <img id="photos" src='images/c15xfo3zgt581.png'>
+
+  <div id="controls">
     <button id="previous">prev</button>
     <button id="next">next</button>
     <button id="timelapse">timelapse</button>
-</div>
+    <button id="pause">pause</button>
+  </div>
 
-<script src="roverCam.js"></script>
-
+  <script src="roverCam.js"></script>
 </body>
 </html>

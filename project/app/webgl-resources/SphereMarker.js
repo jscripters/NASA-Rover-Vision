@@ -1,4 +1,4 @@
-class CircleMarker {
+class SphereMarker {
   constructor(gl, name, divContainerElement, vsSource, fsSource, color = [0, 0, 1, 1], radius = 0.1, latSegments = 16, longSegments = 16) {
     this.gl = gl;
     this.name = name;
@@ -10,19 +10,41 @@ class CircleMarker {
     this.textVisible = false;
 
     this.vertexBuffer = null;
-    this.colorBuffer = null;
     this.indexBuffer = null;
+    this.coordinatePosition = null;
 
     this.vertexCount = 0;
     this.shaderProgram = initShaders(gl, vsSource, fsSource);
     this.initBuffers();
   }
 
+  // setupContainerElement(divContainerElement, name, color) {
+  //   this.div = document.createElement('div');
+  //   this.div.style.position = 'absolute';
+  //   this.div.style.pointerEvents = 'none';
+  //   this.div.style.color = color;
+  //   this.textNode = document.createTextNode(name);
+  //   this.div.appendChild(this.textNode);
+
+  //   divContainerElement.appendChild(this.div);
+  // }
+
   setupContainerElement(divContainerElement, name, color) {
     this.div = document.createElement('div');
     this.div.style.position = 'absolute';
     this.div.style.pointerEvents = 'none';
     this.div.style.color = color;
+    this.div.style.fontFamily = 'Arial, sans-serif';
+    this.div.style.fontSize = '12px';
+    this.div.style.fontWeight = 'bold';
+    this.div.style.textShadow = '1px 1px 2px black';
+    this.div.style.transform = 'translate(-50%, -50%)';
+    this.div.style.whiteSpace = 'nowrap';
+
+    this.div.style.backgroundColor = 'rgba(0, 0, 0, 0.4)';
+    this.div.style.padding = '2px 4px';
+    this.div.style.borderRadius = '3px';
+
     this.textNode = document.createTextNode(name);
     this.div.appendChild(this.textNode);
 
@@ -31,7 +53,6 @@ class CircleMarker {
 
   initBuffers() {
     const vertices = [];
-    const colors = [];
     const indices = [];
 
     for (let lat = 0; lat <= this.latSegments; lat++) {
@@ -49,7 +70,6 @@ class CircleMarker {
         const z = this.radius * sinPhi * sinTheta;
 
         vertices.push(x, y, z);
-        colors.push(...this.color);
       }
     }
 
@@ -68,10 +88,6 @@ class CircleMarker {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 
-    this.colorBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.colorBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
-
     this.indexBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
@@ -80,6 +96,8 @@ class CircleMarker {
   }
 
   configureMaterialProperties(material, lightSources) {
+    const MAX_LIGHTS = 8
+
     this.ambientProducts = [];
     this.diffuseProducts = [];
     this.specularProducts = [];
@@ -90,6 +108,14 @@ class CircleMarker {
       this.ambientProducts.push(mult(light._ambient, material._ambient));
       this.diffuseProducts.push(mult(light._diffuse, material._diffuse));
       this.specularProducts.push(mult(light._specular, material._specular));
+      this.lightPositions.push(light._lightPos);
+    }
+
+    for (let i = lightSources.length; i < MAX_LIGHTS; i++) {
+      this.ambientProducts.push([0, 0, 0, 0]);
+      this.diffuseProducts.push([0, 0, 0, 0]);
+      this.specularProducts.push([0, 0, 0, 0]);
+      this.lightPositions.push([0, 0, 0]);
     }
 
     this.materialShininess = material._shininess;
@@ -99,24 +125,29 @@ class CircleMarker {
     const gl = this.gl;
     gl.useProgram(this.shaderProgram);
 
-    console.log(modelViewMatrix, projectionMatrix);
-
-    const aVertexPosition = gl.getAttribLocation(this.shaderProgram, "aVertexPosition");
+    const aPosition = gl.getAttribLocation(this.shaderProgram, "aPosition");
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
-    gl.vertexAttribPointer(aVertexPosition, 3, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(aVertexPosition);
+    gl.vertexAttribPointer(aPosition, 3, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(aPosition);
 
     gl.uniform1i(gl.getUniformLocation(this.shaderProgram, "uTotalLightSources"), this._totalLightSources);
-    gl.uniform4fv(gl.getUniformLocation(this._shaderProgram, "ambientProducts"), flatten(this.ambientProducts));
-    gl.uniform4fv(gl.getUniformLocation(this._shaderProgram, "diffuseProducts"), flatten(this.diffuseProducts));
-    gl.uniform4fv(gl.getUniformLocation(this._shaderProgram, "specularProducts"), flatten(this.specularProducts));
-    gl.uniform3fv(gl.getUniformLocation(this._shaderProgram, "lightPositions"), flatten(this.lightPositions));
-    gl.uniform1f(gl.getUniformLocation(this._shaderProgram, "shininess"), this.materialShininess);
+    gl.uniform4fv(gl.getUniformLocation(this.shaderProgram, "ambientProducts"), flatten(this.ambientProducts));
+    gl.uniform4fv(gl.getUniformLocation(this.shaderProgram, "diffuseProducts"), flatten(this.diffuseProducts));
+    gl.uniform4fv(gl.getUniformLocation(this.shaderProgram, "specularProducts"), flatten(this.specularProducts));
+    gl.uniform3fv(gl.getUniformLocation(this.shaderProgram, "lightPositions"), flatten(this.lightPositions));
+    gl.uniform1f(gl.getUniformLocation(this.shaderProgram, "shininess"), this.materialShininess);
 
-    const uMVPMatrix = gl.getUniformLocation(this.shaderProgram, "uMVPMatrix");
-    gl.uniformMatrix4fv(uMVPMatrix, false, flatten(mult(projectionMatrix, modelViewMatrix)));
+    const uModelViewMatrix = gl.getUniformLocation(this.shaderProgram, "modelViewMatrix");
+    const uProjectionMatrix = gl.getUniformLocation(this.shaderProgram, "projectionMatrix");
+    gl.uniformMatrix4fv(uModelViewMatrix, false, flatten(modelViewMatrix));
+    gl.uniformMatrix4fv(uProjectionMatrix, false, flatten(projectionMatrix));
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+
+    if (this.vertexCount === 0) {
+      console.warn("SphereMarker: no indices to draw!");
+      return;
+    }
     gl.drawElements(gl.TRIANGLES, this.vertexCount, gl.UNSIGNED_SHORT, 0);
 
     if (this.textVisible) {

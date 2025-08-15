@@ -1,10 +1,10 @@
 class SMFModel {
-  constructor(gl, fileName, vsSource, fsSource) {
+  constructor(gl, fileName, texture, vsSource, fsSource) {
     this._gl = gl;
     this._shaderProgram = initShaders(gl, vsSource, fsSource);
     this._modelViewMatrix = mat4();
     this._projectionMatrix = mat4();
-    this._texture = this.loadTexture(gl, '8k_mars.jpg');
+    this._texture = this.loadTexture(gl, texture);
     this._totalLightSources = 0;
     this.loadFile(fileName);
     this.initBuffers();
@@ -206,6 +206,8 @@ class SMFModel {
   }
 
   configureMaterialProperties(material, lightSources) {
+    const MAX_LIGHTS = 8
+
     this.ambientProducts = [];
     this.diffuseProducts = [];
     this.specularProducts = [];
@@ -216,6 +218,14 @@ class SMFModel {
       this.ambientProducts.push(mult(light._ambient, material._ambient));
       this.diffuseProducts.push(mult(light._diffuse, material._diffuse));
       this.specularProducts.push(mult(light._specular, material._specular));
+      this.lightPositions.push(light._lightPos);
+    }
+
+    for (let i = lightSources.length; i < MAX_LIGHTS; i++) {
+      this.ambientProducts.push([0, 0, 0, 0]);
+      this.diffuseProducts.push([0, 0, 0, 0]);
+      this.specularProducts.push([0, 0, 0, 0]);
+      this.lightPositions.push([0, 0, 0]);
     }
 
     this.materialShininess = material._shininess;

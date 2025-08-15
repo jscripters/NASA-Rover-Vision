@@ -107,6 +107,11 @@ class CircleMarker {
     gl.enableVertexAttribArray(aVertexPosition);
 
     gl.uniform1i(gl.getUniformLocation(this.shaderProgram, "uTotalLightSources"), this._totalLightSources);
+    gl.uniform4fv(gl.getUniformLocation(this._shaderProgram, "ambientProducts"), flatten(this.ambientProducts));
+    gl.uniform4fv(gl.getUniformLocation(this._shaderProgram, "diffuseProducts"), flatten(this.diffuseProducts));
+    gl.uniform4fv(gl.getUniformLocation(this._shaderProgram, "specularProducts"), flatten(this.specularProducts));
+    gl.uniform3fv(gl.getUniformLocation(this._shaderProgram, "lightPositions"), flatten(this.lightPositions));
+    gl.uniform1f(gl.getUniformLocation(this._shaderProgram, "shininess"), this.materialShininess);
 
     const uMVPMatrix = gl.getUniformLocation(this.shaderProgram, "uMVPMatrix");
     gl.uniformMatrix4fv(uMVPMatrix, false, flatten(mult(projectionMatrix, modelViewMatrix)));

@@ -1,15 +1,14 @@
 #version 300 es
 precision mediump float;
 
-const int NUM_LIGHTS = 2;
-
-uniform vec4 ambientProducts[NUM_LIGHTS];
-uniform vec4 diffuseProducts[NUM_LIGHTS];
-uniform vec4 specularProducts[NUM_LIGHTS];
+uniform int uTotalLightSources;
+uniform vec4 ambientProducts[uTotalLightSources];
+uniform vec4 diffuseProducts[uTotalLightSources];
+uniform vec4 specularProducts[uTotalLightSources];
 uniform float shininess;
 
 in vec3 vN;
-in vec3 vL[NUM_LIGHTS];
+in vec3 vL[uTotalLightSources];
 in vec3 vE;
 
 out vec4 fColor;
@@ -21,7 +20,7 @@ void main()
 
   vec3 color = vec3(0.0);
 
-  for (int i = 0; i < NUM_LIGHTS; ++i) {
+  for (int i = 0; i < uTotalLightSources; ++i) {
     vec3 L = normalize(vL[i]);
     vec3 H = normalize( L + E );
     vec3 ambient = ambientProducts[i].rgb;

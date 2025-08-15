@@ -1,17 +1,17 @@
 #version 300 es
 precision mediump float;
 
-const int NUM_LIGHTS = 2;
+uniform int uTotalLightSources;
 
 in vec3 aPosition;
 in vec3 aNormal;
 in vec2 aTexCoord;
 out vec4 vColor;
 out vec2 vTexCoord;
-uniform vec4 ambientProducts[NUM_LIGHTS];
-uniform vec4 diffuseProducts[NUM_LIGHTS];
-uniform vec4 specularProducts[NUM_LIGHTS];
-uniform vec3 lightPositions[NUM_LIGHTS];
+uniform vec4 ambientProducts[uTotalLightSources];
+uniform vec4 diffuseProducts[uTotalLightSources];
+uniform vec4 specularProducts[uTotalLightSources];
+uniform vec3 lightPositions[uTotalLightSources];
 uniform float shininess;
 uniform mat4 modelViewMatrix;
 uniform mat4 projectionMatrix;
@@ -25,7 +25,7 @@ void main()
   vec3 totalDiffuse = vec3(0.0);
   vec3 totalSpecular = vec3(0.0);
 
-  for (int i = 0; i < NUM_LIGHTS; i++) {
+  for (int i = 0; i < uTotalLightSources; i++) {
     vec3 L = normalize( lightPositions[i] - pos );
     vec3 E = normalize( -pos );
     vec3 H = normalize( L + E );

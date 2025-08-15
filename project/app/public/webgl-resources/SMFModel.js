@@ -1,17 +1,20 @@
 class SMFModel {
-  constructor(gl, fileName, texture, vsSource, fsSource) {
+  constructor(gl, file, texture, shaderProgram) {
     this._gl = gl;
-    this._shaderProgram = initShaders(gl, vsSource, fsSource);
+    this._shaderProgram = shaderProgram;
     this._modelViewMatrix = mat4();
     this._projectionMatrix = mat4();
-    this._texture = this.loadTexture(gl, texture);
     this._totalLightSources = 0;
-    this.loadFile(fileName);
+    this._texture = null;
+    this.loadTexture(gl, texture).then(tex => {
+      this._texture = tex;
+    });
+    this.loadFile(file);
     this.initBuffers();
   }
 
-  loadFile(fileName) {
-    const smf_file = loadFileAJAX(fileName);
+  loadFile(file) {
+    const smf_file = file;
     const lines = smf_file.split('\n');
     const vertices = [];
     const faces = [];
@@ -196,6 +199,7 @@ class SMFModel {
     } else {
       // fallback or skip drawing texture
       console.warn('Texture not loaded yet');
+      return;
     }
 
     gl.drawArrays(gl.TRIANGLES, 0, this._vertexPositions.length);
@@ -258,19 +262,27 @@ class SMFModel {
                   new Uint8Array([255, 255, 255, 255]));
 
     const image = new Image();
-    image.onload = () => {
-      gl.bindTexture(gl.TEXTURE_2D, texture);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
-                    gl.RGBA, gl.UNSIGNED_BYTE, image);
-      gl.generateMipmap(gl.TEXTURE_2D);
+    return new Promise((resolve, reject) => {
+      image.onload = () => {
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
+                      gl.RGBA, gl.UNSIGNED_BYTE, image);
+        gl.generateMipmap(gl.TEXTURE_2D);
 
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 
-      texture.loaded = true;  // mark loaded
-    };
-    image.src = url;
+        texture.loaded = true;  // mark loaded
+        resolve(texture);       // resolve the Promise
+      };
 
-    return texture;
+      image.onerror = (event) => {
+        console.error(`Failed to load texture from ${url}`);
+        console.error("Error event details:", event);
+        reject(new Error(`Failed to load texture from ${url}: ${event.message || event}`));
+      };
+
+      image.src = url; // Start loading the image
+    });
   }
 }

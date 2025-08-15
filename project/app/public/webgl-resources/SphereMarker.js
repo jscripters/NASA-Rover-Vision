@@ -1,5 +1,5 @@
 class SphereMarker {
-  constructor(gl, name, divContainerElement, vsSource, fsSource, color = [0, 0, 1, 1], radius = 0.1, latSegments = 16, longSegments = 16) {
+  constructor(gl, name, divContainerElement, shaderProgram, color = [0, 0, 1, 1], radius = 0.1, latSegments = 16, longSegments = 16) {
     this.gl = gl;
     this.name = name;
     this.radius = radius;
@@ -14,20 +14,9 @@ class SphereMarker {
     this.coordinatePosition = null;
 
     this.vertexCount = 0;
-    this.shaderProgram = initShaders(gl, vsSource, fsSource);
+    this._shaderProgram = shaderProgram;
     this.initBuffers();
   }
-
-  // setupContainerElement(divContainerElement, name, color) {
-  //   this.div = document.createElement('div');
-  //   this.div.style.position = 'absolute';
-  //   this.div.style.pointerEvents = 'none';
-  //   this.div.style.color = color;
-  //   this.textNode = document.createTextNode(name);
-  //   this.div.appendChild(this.textNode);
-
-  //   divContainerElement.appendChild(this.div);
-  // }
 
   setupContainerElement(divContainerElement, name, color) {
     this.div = document.createElement('div');
@@ -123,22 +112,22 @@ class SphereMarker {
 
   draw(modelViewMatrix, projectionMatrix) {
     const gl = this.gl;
-    gl.useProgram(this.shaderProgram);
+    gl.useProgram(this._shaderProgram);
 
-    const aPosition = gl.getAttribLocation(this.shaderProgram, "aPosition");
+    const aPosition = gl.getAttribLocation(this._shaderProgram, "aPosition");
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
     gl.vertexAttribPointer(aPosition, 3, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(aPosition);
 
-    gl.uniform1i(gl.getUniformLocation(this.shaderProgram, "uTotalLightSources"), this._totalLightSources);
-    gl.uniform4fv(gl.getUniformLocation(this.shaderProgram, "ambientProducts"), flatten(this.ambientProducts));
-    gl.uniform4fv(gl.getUniformLocation(this.shaderProgram, "diffuseProducts"), flatten(this.diffuseProducts));
-    gl.uniform4fv(gl.getUniformLocation(this.shaderProgram, "specularProducts"), flatten(this.specularProducts));
-    gl.uniform3fv(gl.getUniformLocation(this.shaderProgram, "lightPositions"), flatten(this.lightPositions));
-    gl.uniform1f(gl.getUniformLocation(this.shaderProgram, "shininess"), this.materialShininess);
+    gl.uniform1i(gl.getUniformLocation(this._shaderProgram, "uTotalLightSources"), this._totalLightSources);
+    gl.uniform4fv(gl.getUniformLocation(this._shaderProgram, "ambientProducts"), flatten(this.ambientProducts));
+    gl.uniform4fv(gl.getUniformLocation(this._shaderProgram, "diffuseProducts"), flatten(this.diffuseProducts));
+    gl.uniform4fv(gl.getUniformLocation(this._shaderProgram, "specularProducts"), flatten(this.specularProducts));
+    gl.uniform3fv(gl.getUniformLocation(this._shaderProgram, "lightPositions"), flatten(this.lightPositions));
+    gl.uniform1f(gl.getUniformLocation(this._shaderProgram, "shininess"), this.materialShininess);
 
-    const uModelViewMatrix = gl.getUniformLocation(this.shaderProgram, "modelViewMatrix");
-    const uProjectionMatrix = gl.getUniformLocation(this.shaderProgram, "projectionMatrix");
+    const uModelViewMatrix = gl.getUniformLocation(this._shaderProgram, "modelViewMatrix");
+    const uProjectionMatrix = gl.getUniformLocation(this._shaderProgram, "projectionMatrix");
     gl.uniformMatrix4fv(uModelViewMatrix, false, flatten(modelViewMatrix));
     gl.uniformMatrix4fv(uProjectionMatrix, false, flatten(projectionMatrix));
 

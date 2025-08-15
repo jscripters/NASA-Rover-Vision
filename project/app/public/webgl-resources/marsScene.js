@@ -1,17 +1,11 @@
 var canvas;
 var smfModel;
 
-let defaultRadius = 100;
-let defaultTheta  = 0;
-let defaultHeight = 0;
-
 let radius  = 100;
 let degrees = 0;
 let height  = 0;
 
-let radiusStep = 5;
 var thetaStep  = 0.01;
-var heightStep = 1;
 
 var cameraLightSource = new PointLightSource(
   vec4(1.0, 1.0, 1.0, 1.0),
@@ -43,7 +37,16 @@ const RoverLocations = {
 
 var markers = [];
 
-window.onload = function init(){
+async function fetchShader(url) {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Failed to load shader from ${url}: ${response.status} ${response.statusText}`);
+  }
+  const text = await response.text();
+  return text;
+}
+
+window.onload = async function init(){
   canvas = document.getElementById('gl-canvas');
   gl = canvas.getContext('webgl2');
 
@@ -51,24 +54,36 @@ window.onload = function init(){
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
   gl.enable(gl.DEPTH_TEST);
 
-  initEventHandlers();
+  var divContainer = document.getElementById('divcontainer');
 
-  var divcontainer = document.getElementById('divcontainer');
-  if (divcontainer === null) {
-    console.error("divcontainer element not found");
-  }
+  const [phongVertShader, phongFragShader] = await Promise.all([
+    fetchShader('/webgl-resources/shaders/phong_vert.glsl'),
+    fetchShader('/webgl-resources/shaders/phong_frag.glsl'),
+  ]);
+
+  const phongShaderProgram = initShadersFromSource(gl, phongVertShader, phongFragShader);
 
   for (const [name, coords] of Object.entries(RoverLocations)) {
-    const marker = new SphereMarker(gl, name, divcontainer, "./shaders/phong_vert.glsl", "./shaders/phong_frag.glsl", 'white', 0.01, 16, 16)
+    const marker = new SphereMarker(gl, name, divContainer, phongShaderProgram, 'white', 0.01, 16, 16)
     marker.configureMaterialProperties(markerMaterial, [cameraLightSource]);
     marker.coordinatePosition = coords;
     marker.textVisible = true;
     markers.push(marker);
   }
 
-  smfModel = new SMFModel(gl, './models/sphere.smf', './textures/8k_mars.jpg', "./shaders/gouraud_vert.glsl", "./shaders/gouraud_frag.glsl");
+  const [gouraudVertShader, gouraudFragShader] = await Promise.all([
+    fetchShader('/webgl-resources/shaders/gouraud_vert.glsl'),
+    fetchShader('/webgl-resources/shaders/gouraud_frag.glsl'),
+  ]);
+
+  const model = await fetchShader('/webgl-resources/models/sphere.smf');
+  const gouraudShaderProgram = initShadersFromSource(gl, gouraudVertShader, gouraudFragShader);
+
+  smfModel = new SMFModel(gl, model, '/webgl-resources/textures/8k_mars.jpg', gouraudShaderProgram);
   smfModel.setPerspective(45 * Math.PI / 180, canvas.width / canvas.height, 0.1, 1000.0);
   smfModel.configureMaterialProperties(marsMaterial, [cameraLightSource]);
+
+  initEventHandlers();
 
   render();
 }
@@ -93,6 +108,7 @@ function render() {
 
   for (const marker of markers) {
     markerModelMatrix = markerModelMatrixFromLatLon(marker.coordinatePosition[0], marker.coordinatePosition[1], modelRadius + 0.01, viewMatrix);
+    marker.configureMaterialProperties(markerMaterial, [cameraLightSource]);
     marker.draw(markerModelMatrix, smfModel._projectionMatrix);
   }
 

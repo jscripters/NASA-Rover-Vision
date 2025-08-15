@@ -11,11 +11,25 @@
     #photos {
       position: fixed;
       inset: 0;
-      width: 100vw; 
-      height: 100vh; 
-      object-fit: cover; 
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
       /*display: block; /* Remove extra space below image */
       z-index: 1;
+    }
+
+    #gl-canvas, #divcontainer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 800px;
+      height: 800px;
+    }
+
+    #gl-canvas, #divcontainer {
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
     }
 
     /* Top banner */
@@ -120,7 +134,6 @@
   </style>
 </head>
 <body>
-
   <h1 class="banner">NASA Rover Vision</h1>
 
   <div class="recommendations">
@@ -153,7 +166,11 @@
     <button id="submit">submit</button>
   </div>
 
-  <img id="photos" src='images/c15xfo3zgt581.png'>
+  <canvas id="gl-canvas" width="800" height="800">
+  <!-- This message shows up only if the Canvas element isn't supported -->
+      HTML5 canvas not supported in your browser!
+  </canvas>
+  <div id="divcontainer"></div>
 
   <div id="controls">
     <button id="previous">prev</button>
@@ -162,6 +179,15 @@
     <button id="pause">pause</button>
   </div>
 
+  <script src="https://greggman.github.io/webgl-lint/webgl-lint.js" crossorigin></script>
+  <script type="text/javascript" src="webgl-resources/Common/initShaders2.js"></script>
+  <script type="text/javascript" src="webgl-resources/Common/MVnew.js"></script>
+  <script type="text/javascript" src="webgl-resources/SMFModel.js"></script>
+  <script type="text/javascript" src="webgl-resources/PointLightSource.js"></script>
+  <script type="text/javascript" src="webgl-resources/Material.js"></script>
+  <script type="text/javascript" src="webgl-resources/SphereMarker.js"></script>
+  <script type="text/javascript" src="webgl-resources/marsScene.js"></script>
   <script src="roverCam.js"></script>
+
 </body>
 </html>

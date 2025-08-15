@@ -1,13 +1,12 @@
 class CircleMarker {
-  constructor(gl, name, radius = 0.1, latSegments = 16, longSegments = 16, color = [0, 0, 1, 1], divContainerElement) {
+  constructor(gl, name, divContainerElement, vsSource, fsSource, color = [0, 0, 1, 1], radius = 0.1, latSegments = 16, longSegments = 16) {
     this.gl = gl;
     this.name = name;
     this.radius = radius;
     this.latSegments = latSegments;
     this.longSegments = longSegments;
-    this.color = color;
 
-    this.setupContainerElement(name);
+    this.setupContainerElement(divContainerElement, name, color);
     this.textVisible = false;
 
     this.vertexBuffer = null;
@@ -15,15 +14,15 @@ class CircleMarker {
     this.indexBuffer = null;
 
     this.vertexCount = 0;
-    this.shaderProgram = initShaders(gl, './shaders/vert.glsl', './shaders/frag.glsl');
+    this.shaderProgram = initShaders(gl, vsSource, fsSource);
     this.initBuffers();
   }
 
-  setupContainerElement(name) {
+  setupContainerElement(divContainerElement, name, color) {
     this.div = document.createElement('div');
     this.div.style.position = 'absolute';
     this.div.style.pointerEvents = 'none';
-    this.div.style.color = 'white';
+    this.div.style.color = color;
     this.textNode = document.createTextNode(name);
     this.div.appendChild(this.textNode);
 
@@ -80,6 +79,22 @@ class CircleMarker {
     this.vertexCount = indices.length;
   }
 
+  configureMaterialProperties(material, lightSources) {
+    this.ambientProducts = [];
+    this.diffuseProducts = [];
+    this.specularProducts = [];
+    this.lightPositions = [];
+    this._totalLightSources = lightSources.length;
+
+    for (const light of lightSources) {
+      this.ambientProducts.push(mult(light._ambient, material._ambient));
+      this.diffuseProducts.push(mult(light._diffuse, material._diffuse));
+      this.specularProducts.push(mult(light._specular, material._specular));
+    }
+
+    this.materialShininess = material._shininess;
+  }
+
   draw(modelViewMatrix, projectionMatrix) {
     const gl = this.gl;
     gl.useProgram(this.shaderProgram);
@@ -91,10 +106,7 @@ class CircleMarker {
     gl.vertexAttribPointer(aVertexPosition, 3, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(aVertexPosition);
 
-    const aVertexColor = gl.getAttribLocation(this.shaderProgram, "aVertexColor");
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.colorBuffer);
-    gl.vertexAttribPointer(aVertexColor, 4, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(aVertexColor);
+    gl.uniform1i(gl.getUniformLocation(this.shaderProgram, "uTotalLightSources"), this._totalLightSources);
 
     const uMVPMatrix = gl.getUniformLocation(this.shaderProgram, "uMVPMatrix");
     gl.uniformMatrix4fv(uMVPMatrix, false, flatten(mult(projectionMatrix, modelViewMatrix)));

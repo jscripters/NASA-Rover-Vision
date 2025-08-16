@@ -11,11 +11,11 @@
     #photos {
       position: fixed;
       inset: 0;
-      width: 100vw; 
-      height: 100vh; 
-      object-fit: cover; 
-      /*display: block; /* Remove extra space below image */
-      z-index: 1;
+      background-image: url('images/c15xfo3zgt581.png'); 
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      z-index: 0;
     }
 
     /* Top banner */
@@ -35,7 +35,7 @@
     /* Right panel */
     .recommendations {
       position: fixed;
-      top: 76px;
+      top: 60px;  
       right: 16px;
       width: 240px;
       background: rgba(31, 30, 30, 0.8);
@@ -43,22 +43,7 @@
       padding: 12px 14px;
       border: 1px solid rgba(255,255,255,0.25);
       border-radius: 12px;
-      height: calc((100vh/2) - 76px - 24px);
-      overflow: auto;
-      z-index: 2;
-    }
-
-    .msg {
-      position: fixed;
-      top: 500px;
-      right: 16px;
-      width: 240px;
-      background: rgba(31, 30, 30, 0.8);
-      color: #fff;
-      padding: 12px 14px;
-      border: 1px solid rgba(255,255,255,0.25);
-      border-radius: 12px;
-      height: calc((100vh/6) - 76px - 24px);
+      height: calc(100vh - 65px - 420px - 24px); 
       overflow: auto;
       z-index: 2;
     }
@@ -117,6 +102,59 @@
       cursor: pointer;
     }
     #controls button:hover { background: rgba(255,255,255,0.1); }
+
+    #chatbox {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      width: 270px;   
+      height: 400px;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      color: #fff;
+      z-index: 9999;
+    }
+
+    #chat-messages {
+      flex: 1;                    
+      overflow-y: auto;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    #chat-form {
+      display: flex;
+      gap: 8px;
+      padding: 10px;
+      border-top: 1px solid rgba(255,255,255,0.2);
+    }
+
+    #chat-input {
+      flex: 1;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.3);
+      background: rgba(0,0,0,0.3);
+      color: #fff;
+    }
+
+    #chat-form button {
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      cursor: pointer;
+    }
+    #chat-form button:hover {
+      background: rgba(255,255,255,0.25);
+    }
+
   </style>
 </head>
 <body>
@@ -126,10 +164,6 @@
   <div class="recommendations">
     <p id="rovername"></p>
     <div id="add"></div>
-  </div>
-
-  <div class="msg">
-    <p id="errors"></p>
   </div>
 
   <div id="input">
@@ -153,13 +187,21 @@
     <button id="submit">submit</button>
   </div>
 
-  <img id="photos" src='images/c15xfo3zgt581.png'>
+  <div id="photos"></div>
 
   <div id="controls">
     <button id="previous">prev</button>
     <button id="next">next</button>
     <button id="timelapse">timelapse</button>
     <button id="pause">pause</button>
+  </div>
+
+  <div id="chatbox">
+    <div id="chat-messages"></div>
+    <form id="chat-form">
+      <input id="chat-input" type="text" placeholder="Type a message…">
+      <button type="button">Send</button>
+    </form>
   </div>
 
   <script src="roverCam.js"></script>

@@ -5,6 +5,7 @@ let prevButton = document.getElementById("previous");
 let timelapseButton = document.getElementById("timelapse");
 let pauseButton = document.getElementById("pause");
 let cameraOptions = document.getElementById("camera");
+let errosMsg = document.getElementById("errors");
 
 let recContainer = document.getElementById("add");
 function addDayToRecTable(day) {
@@ -27,12 +28,14 @@ function getManifest(camArr, rover) {
   fetch(url).then((response) => response.json())
     .then((body) => {
       let manifestLen = body.length;
+      //console.log(body);
       for (let i = 0; i < manifestLen; i++) {
         if (body[i].total_photos >= 300) {
           addDayToRecTable(body[i].sol);
         }
-        camArr.push(body[i].cameras);
+        camArr[body[i].sol]=body[i].cameras;
       }
+      //console.log(camArr)
     }).catch(error => console.log(error));
 }
 
@@ -43,7 +46,7 @@ let interval;
 function timelaspe() {
   interval = setInterval(function () {
     getNextPhotos();
-  }, 600);
+  }, 700);
   isIntervalOn = true;
 }
 
@@ -54,7 +57,7 @@ function stopInterval() {
 
 function getNextPhotos() {
   if (currentSrc < photosArr.length) {
-    images.style.backgroundImage = `url(${photosArr[currentSrc]})`;
+    images.src = photosArr[currentSrc];
     currentSrc += 1;
   } else {
     currentSrc = 0;
@@ -63,7 +66,7 @@ function getNextPhotos() {
 
 function getPrevPhotos() {
   if (currentSrc > 0) {
-    images.style.backgroundImage = `url(${photosArr[currentSrc]})`;
+    images.src = photosArr[currentSrc];
     currentSrc -= 1;
   } else {
     currentSrc = 0;
@@ -79,12 +82,17 @@ function submit(srcArr) {
   fetch(url).then((response) => response.json())
     .then((body) => {
       let maxLen = body.photos.length;
+      console.log(body)
       for (let i = 0; i < maxLen; i++) {
         const imageSource = body.photos[i].img_src.toString();
         srcArr.push(imageSource);
       }
       if (srcArr.length > 0) {
-        images.style.backgroundImage = `url(${srcArr[0]})`;
+        errosMsg.textContent=`There are ${maxLen} photos here`;
+        images.src = body.photos[0].img_src.toString();
+      }
+      else{
+        errosMsg.textContent="There are no photos from this camera, please choose another";
       }
     }).catch(error => console.log(error));
 }
@@ -103,6 +111,7 @@ let avaliableCams = [];
 const roverInput = document.getElementById("rover");
 let roverName = document.getElementById("rovername");
 roverInput.addEventListener('change', () => {
+  avaliableCams = {};
   recContainer.textContent = "";
   roverName.textContent = roverInput.value.charAt(0).toUpperCase() + roverInput.value.slice(1) + " Available Sol Days";
   getManifest(avaliableCams, roverInput.value);
@@ -126,6 +135,7 @@ getCams.addEventListener("click", () => {
 let photosArr = [];
 let firstClick = true;
 function submitClick() {
+  errosMsg.textContent = "";
   if (!firstClick) {
     photosArr = [];
     currentSrc = 0;

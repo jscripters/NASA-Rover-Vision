@@ -1,19 +1,30 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="utf-8">
   <title>Nasa Rover Vision</title>
   <style>
-    html, body { margin: 0; padding: 0; height: 100%; }
-    body { background-color: #000; overflow-x: hidden; font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+
+    body {
+      background-color: #000;
+      overflow-x: hidden;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    }
 
     /* Fullscreen background behind everything */
     #photos {
       position: fixed;
       inset: 0;
-      width: 100vw; 
-      height: 100vh; 
-      object-fit: cover; 
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
       /*display: block; /* Remove extra space below image */
       z-index: 1;
     }
@@ -21,7 +32,9 @@
     /* Top banner */
     .banner {
       position: fixed;
-      top: 0; left: 0; right: 0;
+      top: 0;
+      left: 0;
+      right: 0;
       height: 60px;
       margin: 0;
       background-color: rgb(11, 61, 145);
@@ -35,22 +48,21 @@
     /* Right panel */
     .recommendations {
       position: fixed;
-      top: 76px;
+      top: 60px;
       right: 16px;
       width: 240px;
       background: rgba(31, 30, 30, 0.8);
       color: #fff;
       padding: 12px 14px;
-      border: 1px solid rgba(255,255,255,0.25);
+      border: 1px solid rgba(255, 255, 255, 0.25);
       border-radius: 12px;
-      height: calc((100vh/2) - 76px - 24px);
+      height: calc(100vh - 65px - 420px - 24px);
       overflow: auto;
       z-index: 2;
     }
-
     .msg {
       position: fixed;
-      top: 500px;
+      bottom: 85px;
       right: 16px;
       width: 240px;
       background: rgba(31, 30, 30, 0.8);
@@ -62,7 +74,6 @@
       overflow: auto;
       z-index: 2;
     }
-
     /* Form overlay */
     #input {
       position: fixed;
@@ -74,22 +85,25 @@
       gap: 12px 14px;
       align-items: center;
       color: #fff;
-      background: rgba(0,0,0,0.45);
+      background: rgba(0, 0, 0, 0.45);
       backdrop-filter: blur(4px);
       padding: 12px 16px;
       border-radius: 12px;
       z-index: 2;
     }
 
-    #input label { margin-right: 4px; white-space: nowrap; }
+    #input label {
+      margin-right: 4px;
+      white-space: nowrap;
+    }
 
     #input input,
     #input select,
     #input button {
       padding: 6px 10px;
       border-radius: 8px;
-      border: 1px solid rgba(255,255,255,0.35);
-      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      background: rgba(0, 0, 0, 0.35);
       color: #fff;
     }
 
@@ -100,7 +114,7 @@
       bottom: 16px;
       display: flex;
       gap: 10px;
-      background: rgba(0,0,0,0.45);
+      background: rgba(0, 0, 0, 0.45);
       backdrop-filter: blur(4px);
       padding: 10px 12px;
       border-radius: 12px;
@@ -111,14 +125,71 @@
       padding: 20px 40px;
       font-size: 18px;
       border-radius: 8px;
-      border: 1px solid rgba(255,255,255,0.35);
-      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      background: rgba(0, 0, 0, 0.35);
       color: #fff;
       cursor: pointer;
     }
-    #controls button:hover { background: rgba(255,255,255,0.1); }
+
+    #controls button:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    #chatbox {
+      position: fixed;
+      left: 16px;
+      bottom: 100px;
+      width: 500px;
+      height: 400px;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      color: #fff;
+      z-index: 9999;
+    }
+
+    #chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    #chat-form {
+      display: flex;
+      gap: 8px;
+      padding: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    #chat-input {
+      flex: 1;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      background: rgba(0, 0, 0, 0.3);
+      color: #fff;
+    }
+
+    #chat-form button {
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      cursor: pointer;
+    }
+
+    #chat-form button:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
   </style>
 </head>
+
 <body>
 
   <h1 class="banner">NASA Rover Vision</h1>
@@ -161,7 +232,12 @@
     <button id="timelapse">timelapse</button>
     <button id="pause">pause</button>
   </div>
-
+  <div id="chatbox">
+    <div id="chat-messages"></div>
+    <form id="chat-form"> <input id="chat-input" type="text" placeholder="Type a message…"> <button
+        type="submit">Send</button> </form>
+  </div>
   <script src="roverCam.js"></script>
 </body>
+
 </html>

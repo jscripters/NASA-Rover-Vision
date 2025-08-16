@@ -149,3 +149,25 @@ nextButton.addEventListener("click", nextButtonClicked);
 prevButton.addEventListener("click", prevButtonClicked);
 pauseButton.addEventListener("click", stopInterval);
 timelapseButton.addEventListener("click", timelaspe);
+
+const socket = io();
+
+function voteBtnClicked() {
+  const userId = socket.id; // TODO: change
+  const dayValue    = document.getElementById("day").value;
+  const roverValue  = document.getElementById("rover").value;
+  const cameraValue = document.getElementById("camera").value;
+
+  // if (!dayValue || !roverValue || !cameraValue) {
+  //   return;
+  // }
+
+  const voteData = {userId, dayValue, roverValue, cameraValue};
+  socket.emit('userVote', voteData);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  const voteBtn = document.getElementById("vote");
+  voteBtn.addEventListener('click', voteBtnClicked);
+});
+

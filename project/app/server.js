@@ -22,7 +22,6 @@ app.get("/", (req, res) => {
   res.sendFile("public/login.html", { root: __dirname });
 });
 
-
 app.get("/getManifest", (req, res) => {
   let rover = req.query.rover;
   let url = `${baseUrl}manifests/${rover}?api_key=${apiKey}`;

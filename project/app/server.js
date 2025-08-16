@@ -9,11 +9,12 @@ let hostname = "localhost";
 
 let express = require("express");
 const { createServer } = require("node:http");
-const { setupSocket } = require("./socket/socket.js");
+const { startSocketConnection }  = require("./socket/socket.js");
 
 const app = express();
 const server = createServer(app);
-setupSocket(server);
+
+startSocketConnection(server);
 
 app.use(express.static("public"));
 

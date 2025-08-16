@@ -4,17 +4,16 @@ const { open } = require('sqlite');
 
 let pollActive = false;
 let pollStartTime = false;
-let pollDuration= false;
+let pollDuration = false;
+let io;
+let db;
 
 async function setupSocket(server) {
-  const io = new Server(server, {
-    connectionStateRecovery: {}
-  });
+  io = new Server(server, { connectionStateRecovery: {} });
 
-  // open the database file
-  const db = await open({
-      filename: 'chat.db',
-      driver: sqlite3.Database
+  db = await open({
+    filename: 'app.db',
+    driver: sqlite3.Database
   });
 
   await db.exec(`
@@ -24,6 +23,17 @@ async function setupSocket(server) {
         client_offset TEXT UNIQUE,
         content TEXT,
         timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS votes (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      userId TEXT,
+      day TEXT,
+      rover TEXT,
+      camera TEXT,
+      timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
     );
   `);
 
@@ -73,49 +83,101 @@ async function setupSocket(server) {
       callback({ success: true });
     });
 
-    socket.on('userVote', async (voteData) => {
+    socket.on('userVote', async (voteData, callback) => {
       try {
-        const { userId, dayInput, roverInput, cameraInput } = voteData;
+        console.log("Received voteData:", voteData);
 
-        if (!userId || !dayInput || !roverInput || !cameraInput) {
+        const { userId, dayValue, roverValue, cameraValue } = voteData;
+
+        if (!userId || !dayValue || !roverValue || !cameraValue) {
+          console.warn("Incomplete vote received, ignoring:", voteData);
           return;
         }
 
-        const existingVote = await db.get(
+        const userVoteRecord = await db.get(
           `SELECT * FROM votes WHERE userId = ?`,
           [userId]
         );
+        console.log("Existing vote record for user:", userVoteRecord);
 
-        if (existingVote) {
+        if (userVoteRecord) {
+          console.log(`User ${userId} attempted to vote again`);
           return callback({ success: false, error: 'User has already voted' });
         }
 
-        await db.run(`INSERT INTO votes (userId, day, rover, camera) VALUES (?, ?, ?, ?)`, [userId, dayInput, roverInput, cameraInput]);
-        callback({success: true})
+        console.log(`Inserting vote for user ${userId}:`, { dayValue, roverValue, cameraValue });
+        await db.run(
+          `INSERT INTO votes (userId, day, rover, camera) VALUES (?, ?, ?, ?)`,
+          [userId, dayValue, roverValue, cameraValue]
+        );
+
+        console.log(`Vote successfully recorded for user ${userId}`);
+        return callback({ success: true });
 
       } catch (err) {
+        console.error("Error processing vote:", err);
         return callback({ success: false, error: 'Database error' });
       }
     });
 
-    socket.on('disconnect', () => {});
-  });
+
+      socket.on('disconnect', () => {});
+    });
+
+  return io;
 }
 
-function startVotingSession(allocatedTime) {
+async function startVotingSession(allocatedTime) {
   pollActive = true;
   pollStartTime = Date.now();
   pollDuration = allocatedTime;
 
   let result = null;
 
+  await db.run(`DELETE FROM votes`);
   io.emit("pollOpen");
 
-  setTimeout(async () => {
-    pollActive = false;
-    result = await getPollWinner();
-    io.emit("pollClosed")
-  });
+  await new Promise(resolve => setTimeout(resolve, allocatedTime));
+
+  pollActive = false;
+  result = await getPollWinner('votes', 'rover');
+  console.log("Result: ", result);
+  io.emit("pollClosed")
+
+  return result;
 }
 
-module.exports = { setupSocket };
+async function getPollWinner(tableName, columnName) {
+  const cols = await db.all(`PRAGMA table_info(${tableName});`);
+  const colNames = cols.map(c => c.name);
+
+  if (!colNames.includes(columnName)) {
+    throw new Error(`Column ${columnName} does not exist in ${tableName}`);
+  }
+
+  const row = await db.get(
+    `SELECT ${columnName} as value, COUNT(*) as count
+     FROM ${tableName}
+     GROUP BY ${columnName}
+     ORDER BY count DESC
+     LIMIT 1`
+  );
+
+  return row;
+}
+
+async function startVotingCycle() {
+  while (true) {
+    console.log("Starting new voting session...");
+    await startVotingSession(1 * 60 * 1000);
+    console.log("Voting session ended. Waiting 10 minutes...");
+    await new Promise(resolve => setTimeout(resolve, 10 * 60 * 1000));
+  }
+}
+
+async function startSocketConnection(server) {
+  await setupSocket(server);
+  startVotingCycle();
+}
+
+module.exports = { startSocketConnection };

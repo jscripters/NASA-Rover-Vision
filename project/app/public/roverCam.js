@@ -153,21 +153,47 @@ timelapseButton.addEventListener("click", timelaspe);
 const socket = io();
 
 function voteBtnClicked() {
+  const voteBtn = document.getElementById("vote");
+
   const userId = socket.id; // TODO: change
   const dayValue    = document.getElementById("day").value;
   const roverValue  = document.getElementById("rover").value;
   const cameraValue = document.getElementById("camera").value;
 
-  // if (!dayValue || !roverValue || !cameraValue) {
-  //   return;
-  // }
+  if (!dayValue || !roverValue || !cameraValue) {
+    return;
+  }
 
   const voteData = {userId, dayValue, roverValue, cameraValue};
-  socket.emit('userVote', voteData);
+
+  socket.emit('userVote', voteData, (response) => {
+    if (response.success) {
+      voteBtn.disabled = true;
+      voteBtn.style.display = "none";
+    } else {
+      voteBtn.disabled = false;
+      voteBtn.style.display = "inline";
+    }
+  });
 }
 
 document.addEventListener('DOMContentLoaded', function() {
   const voteBtn = document.getElementById("vote");
+  voteBtn.disabled = true;
+  voteBtn.style.display = "none";
+
   voteBtn.addEventListener('click', voteBtnClicked);
+
+  socket.on('pollOpen', () => {
+    voteBtn.disabled = false;
+    voteBtn.style.display = "inline";
+    console.log("Poll is now open");
+  });
+
+  socket.on('pollClosed', () => {
+    voteBtn.disabled = true;
+    voteBtn.style.display = "none";
+    console.log("Poll is now closed");
+  });
 });
 

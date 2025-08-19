@@ -6,6 +6,8 @@ let timelapseButton = document.getElementById("timelapse");
 let pauseButton = document.getElementById("pause");
 let cameraOptions = document.getElementById("camera");
 let errosMsg = document.getElementById("errors");
+let slider = document.getElementById("speedRange");
+let speed = slider.value;
 
 let recContainer = document.getElementById("add");
 function addDayToRecTable(day) {
@@ -44,10 +46,12 @@ let isIntervalOn = false;
 let interval;
 
 function timelaspe() {
-  interval = setInterval(function () {
-    getNextPhotos();
-  }, 700);
-  isIntervalOn = true;
+  if(isIntervalOn == false){
+    interval = setInterval(function () {
+      getNextPhotos();
+    }, speed);
+    isIntervalOn = true;
+  }
 }
 
 function stopInterval() {
@@ -143,6 +147,16 @@ function submitClick() {
   submit(photosArr);
   firstClick = false;
 }
+
+slider.addEventListener('input', function() {
+  speed = parseInt(this.value);
+  //console.log("speed",speed)
+  if(isIntervalOn){
+    stopInterval()
+    timelaspe()
+  }
+
+});
 
 button.addEventListener("click", submitClick);
 nextButton.addEventListener("click", nextButtonClicked);

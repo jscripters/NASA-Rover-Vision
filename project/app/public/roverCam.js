@@ -6,6 +6,8 @@ let timelapseButton = document.getElementById("timelapse");
 let pauseButton = document.getElementById("pause");
 let cameraOptions = document.getElementById("camera");
 let errosMsg = document.getElementById("errors");
+let slider = document.getElementById("speedRange");
+let speed = slider.value;
 
 let recContainer = document.getElementById("add");
 function addDayToRecTable(day) {
@@ -44,10 +46,12 @@ let isIntervalOn = false;
 let interval;
 
 function timelaspe() {
-  interval = setInterval(function () {
-    getNextPhotos();
-  }, 700);
-  isIntervalOn = true;
+  if(isIntervalOn == false){
+    interval = setInterval(function () {
+      getNextPhotos();
+    }, speed);
+    isIntervalOn = true;
+  }
 }
 
 function stopInterval() {
@@ -131,6 +135,16 @@ getCams.addEventListener("click", () => {
     console.log("Error: input day and rover");
   }
 });
+
+function nextButtonClicked() {
+  if (isIntervalOn) { stopInterval(); }
+  getNextPhotos();
+}
+
+function prevButtonClicked() {
+  if (isIntervalOn) { stopInterval(); }
+  getPrevPhotos();
+}
 
 let photosArr = [];
 let firstClick = true;

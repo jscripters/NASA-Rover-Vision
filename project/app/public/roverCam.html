@@ -177,6 +177,15 @@
     <button id="next">next</button>
     <button id="timelapse">timelapse</button>
     <button id="pause">pause</button>
+
+    <input type="range" min="100" max="1000" value="700" id="speedRange">
+    <p>Speed: <span id="sliderValue"></span></p>
+  </div>
+  <div id="chatbox">
+    <div id="chat-messages"></div>
+    <form id="chat-form"> <input id="chat-input" type="text" placeholder="Type a message…"> <button
+        type="submit">Send</button> </form>
+      <button id="pause">pause</button>
     <button id="vote" style="display: none;">vote</button>
   </div>
 
@@ -190,6 +199,6 @@
   <script type="text/javascript" src="webgl-resources/SphereMarker.js"></script>
   <script type="text/javascript" src="webgl-resources/marsScene.js"></script>
   <script src="roverCam.js"></script>
-
 </body>
+
 </html>

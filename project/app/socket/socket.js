@@ -67,6 +67,7 @@ async function setupSocket(server) {
     }
 
     socket.on('chat message', async (username, msg, client_offset, timeStamp, callback) => {
+      console.log(username, msg, client_offset);
       console.log('Received callback:', typeof callback);
       let result;
       try {

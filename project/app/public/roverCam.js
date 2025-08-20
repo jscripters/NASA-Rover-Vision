@@ -1,3 +1,30 @@
+const userIdRaw = sessionStorage.getItem('username');
+if (!userIdRaw) {
+  alert('You are not logged in.');
+  window.location.href = 'login.html';
+}
+
+userId = userIdRaw.trim();
+
+const userColors = {};
+const socket = io({
+  auth: {
+    serverOffset: 0
+  },
+  // enable retries
+  ackTimeout: 10000,
+  retries: 3,
+});
+
+let counter = 0;
+let paused = false;
+let pollDuration = 0;
+
+let speed = slider.value;
+
+const pollTimerElm = document.getElementById("poll-timer");
+const secondsElm   = document.getElementById("seconds-left");
+
 let button = document.getElementById("submit");
 let images = document.getElementById("photos");
 let nextButton = document.getElementById("next");
@@ -7,7 +34,6 @@ let pauseButton = document.getElementById("pause-main");
 let cameraOptions = document.getElementById("camera");
 let errosMsg = document.getElementById("errors");
 let slider = document.getElementById("speedRange");
-let speed = slider.value;
 
 let recContainer = document.getElementById("add");
 function addDayToRecTable(day) {
@@ -164,23 +190,6 @@ prevButton.addEventListener("click", prevButtonClicked);
 pauseButton.addEventListener("click", stopInterval);
 timelapseButton.addEventListener("click", timelaspe);
 
-const userColors = {};
-const socket = io({
-  auth: {
-    serverOffset: 0
-  },
-  // enable retries
-  ackTimeout: 10000,
-  retries: 3,
-});
-
-let counter = 0;
-let paused = false;
-let pollDuration = 0;
-
-const pollTimerEl = document.getElementById("poll-timer");
-const secondsEl = document.getElementById("seconds-left");
-
 function hashStringToInt(str) {
   const p = 31;
   const m = 1e9 + 9;
@@ -208,7 +217,7 @@ function getUserColor(username) {
 function voteButtonClicked() {
   const voteButton = document.getElementById("vote");
 
-  const userId      = socket.id; // TODO: change
+  const userId      = sessionStorage.getItem('username');
   const dayValue    = document.getElementById("day").value;
   const roverValue  = document.getElementById("rover").value;
   const cameraValue = document.getElementById("camera").value;
@@ -242,7 +251,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (input.value) {
       const clientOffset = `${socket.id}-${counter++}`;
       const timeStamp = new Date().toISOString();
-      socket.emit('chat message', socket.id, input.value, clientOffset, timeStamp, acknowledgementCallback);
+      socket.emit('chat message', userId, input.value, clientOffset, timeStamp, acknowledgementCallback);
       input.value = '';
     }
   });
@@ -302,10 +311,10 @@ function updatePollTimer(isPollActive) {
   const formatted = `${minutes}:${seconds.toString().padStart(2, '0')}`;
 
   if (isPollActive) {
-    secondsEl.textContent = formatted;
+    secondsElm.textContent = formatted;
   } else {
-    pollTimerEl.textContent = `Next poll in: ${formatted}`;
-    secondsEl.classList.remove('hidden');
+    pollTimerElm.textContent = `Next poll in: ${formatted}`;
+    secondsElm.classList.remove('hidden');
   }
 
   if (pollDuration > 0) {
@@ -313,10 +322,10 @@ function updatePollTimer(isPollActive) {
     setTimeout(() => updatePollTimer(isPollActive), 1000);
   } else {
     if (isPollActive) {
-      pollTimerEl.textContent = "Poll Closed";
-      secondsEl.classList.add('hidden');
+      pollTimerElm.textContent = "Poll Closed";
+      secondsElm.classList.add('hidden');
     } else {
-      pollTimerEl.textContent = "Next poll starting…";
+      pollTimerElm.textContent = "Next poll starting…";
     }
   }
 }

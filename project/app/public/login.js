@@ -21,6 +21,7 @@ function login(){
     .then(data => {
         console.log(data);
         if (data.message === "Login successful.") {
+            sessionStorage.setItem('username', usn);
             window.location.href = "roverCam.html";
         } else {
             alert("Login failed: " + (data.error || "Unknown error"));

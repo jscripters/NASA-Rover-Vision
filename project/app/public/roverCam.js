@@ -20,8 +20,6 @@ let counter = 0;
 let paused = false;
 let pollDuration = 0;
 
-let speed = slider.value;
-
 const pollTimerElm = document.getElementById("poll-timer");
 const secondsElm   = document.getElementById("seconds-left");
 
@@ -30,10 +28,11 @@ let images = document.getElementById("photos");
 let nextButton = document.getElementById("next");
 let prevButton = document.getElementById("previous");
 let timelapseButton = document.getElementById("timelapse");
-let pauseButton = document.getElementById("pause-main");
+let pauseButton   = document.getElementById("pause-main");
 let cameraOptions = document.getElementById("camera");
-let errosMsg = document.getElementById("errors");
-let slider = document.getElementById("speedRange");
+let errsMsg = document.getElementById("errors");
+let slider  = document.getElementById("speedRange");
+let speed = slider.value;
 
 let recContainer = document.getElementById("add");
 function addDayToRecTable(day) {
@@ -118,11 +117,11 @@ function submit(srcArr) {
         srcArr.push(imageSource);
       }
       if (srcArr.length > 0) {
-        errosMsg.textContent=`There are ${maxLen} photos here`;
+        errsMsg.textContent=`There are ${maxLen} photos here`;
         images.src = body.photos[0].img_src.toString();
       }
       else{
-        errosMsg.textContent="There are no photos from this camera, please choose another";
+        errsMsg.textContent="There are no photos from this camera, please choose another";
       }
     }).catch(error => console.log(error));
 }
@@ -137,14 +136,14 @@ function prevButtonClicked() {
   getPrevPhotos();
 }
 
-let avaliableCams = [];
+let availableCams = [];
 const roverInput = document.getElementById("rover");
 let roverName = document.getElementById("rovername");
 roverInput.addEventListener('change', () => {
-  avaliableCams = {};
+  availableCams = {};
   recContainer.textContent = "";
   roverName.textContent = roverInput.value.charAt(0).toUpperCase() + roverInput.value.slice(1) + " Available Sol Days";
-  getManifest(avaliableCams, roverInput.value);
+  getManifest(availableCams, roverInput.value);
 });
 
 let getCams = document.getElementById("getCams");
@@ -156,7 +155,7 @@ getCams.addEventListener("click", () => {
   cameraOptions.appendChild(defaultOption);
   let dayInput = document.getElementById("day").value;
   if (dayInput !== "" && roverInput.value !== "") {
-    addCamera(avaliableCams[dayInput]);
+    addCamera(availableCams[dayInput]);
   } else {
     console.log("Error: input day and rover");
   }
@@ -175,7 +174,7 @@ function prevButtonClicked() {
 let photosArr = [];
 let firstClick = true;
 function submitClick() {
-  errosMsg.textContent = "";
+  errsMsg.textContent = "";
   if (!firstClick) {
     photosArr = [];
     currentSrc = 0;
@@ -282,7 +281,7 @@ document.addEventListener('DOMContentLoaded', function() {
   socket.on('pollOpen', (allocatedTime) => {
     voteButton.disabled = false;
     voteButton.classList.remove('hidden');
-    console.log("Poll is now open");
+    //console.log("Poll is now open");
     pollDuration = allocatedTime;
     updatePollTimer(true);
   });
@@ -290,7 +289,7 @@ document.addEventListener('DOMContentLoaded', function() {
   socket.on('pollClosed', (allocatedTime) => {
     voteButton.disabled = true;
     voteButton.classList.add('hidden');
-    console.log("Poll is now closed");
+    //console.log("Poll is now closed");
     pollDuration = allocatedTime;
     updatePollTimer(false);
   });
@@ -310,22 +309,13 @@ function updatePollTimer(isPollActive) {
   const seconds = Math.floor(pollDuration % 60);
   const formatted = `${minutes}:${seconds.toString().padStart(2, '0')}`;
 
-  if (isPollActive) {
-    secondsElm.textContent = formatted;
-  } else {
-    pollTimerElm.textContent = `Next poll in: ${formatted}`;
-    secondsElm.classList.remove('hidden');
-  }
+  document.getElementById("poll-label").textContent =
+    isPollActive ? "Time left in poll: " : "Next poll in: ";
+
+  document.getElementById("seconds-left").textContent = formatted;
 
   if (pollDuration > 0) {
     pollDuration--;
     setTimeout(() => updatePollTimer(isPollActive), 1000);
-  } else {
-    if (isPollActive) {
-      pollTimerElm.textContent = "Poll Closed";
-      secondsElm.classList.add('hidden');
-    } else {
-      pollTimerElm.textContent = "Next poll starting…";
-    }
   }
 }

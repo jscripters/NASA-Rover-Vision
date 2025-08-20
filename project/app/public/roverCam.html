@@ -163,11 +163,7 @@
       <button id="submit" aria-label="Submit rover and camera selection">submit</button>
     </div>
 
-    <div id="canvas-labels"></div>
-    <canvas id="gl-canvas" width="800" height="800">
-    <!-- This message shows up only if the Canvas element isn't supported -->
-        HTML5 canvas not supported in your browser!
-    </canvas>
+    <img id="photos" src='images/c15xfo3zgt581.png'>
 
     <div id="controls">
       <button id="previous" aria-label="Previous image">prev</button>
@@ -186,7 +182,8 @@
         <button type="submit" aria-label="Send message">Send</button>
       </form>
       <div id="poll-timer">
-      Time left in poll: <span id="seconds-left"></span>
+        <span id="poll-label">Time left in poll: </span>
+        <span id="seconds-left"></span>
       </div>
     </div>
 

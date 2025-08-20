@@ -181,7 +181,6 @@ async function startVotingCycle() {
 async function startSocketConnection(server) {
   await setupSocket(server);
   startVotingCycle();
-  setInterval(broadcastPollState, 60 * 1000);
 }
 
 function broadcastPollState() {

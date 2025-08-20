@@ -49,6 +49,7 @@ async function fetchShader(url) {
 window.onload = async function init(){
   canvas = document.getElementById('gl-canvas');
   gl = canvas.getContext('webgl2');
+  console.log("Max texture size:", gl.getParameter(gl.MAX_TEXTURE_SIZE));
 
   gl.viewport(0, 0, canvas.width, canvas.height);
   gl.clearColor(0.0, 0.0, 0.0, 1.0);

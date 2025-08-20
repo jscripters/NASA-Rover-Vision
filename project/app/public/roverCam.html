@@ -1,204 +1,194 @@
 <!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>Nasa Rover Vision</title>
-  <style>
-    html, body { margin: 0; padding: 0; height: 100%; }
-    body { background-color: #000; overflow-x: hidden; font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Nasa Rover Vision</title>
+    <link rel="stylesheet" type="text/css" href="css/chatbox.css">
+    <link rel="stylesheet" type="text/css" href="css/canvas.css">
+    <style>
+      html, body { margin: 0; padding: 0; height: 100%; }
+      body { background-color: #000; overflow-x: hidden; font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
 
-    /* Fullscreen background behind everything */
-    #photos {
-      position: fixed;
-      inset: 0;
-      width: 100vw;
-      height: 100vh;
-      object-fit: cover;
-      /*display: block; /* Remove extra space below image */
-      z-index: 1;
-    }
+      /* Fullscreen background behind everything */
+      #photos {
+        position: fixed;
+        inset: 0;
+        width: 100vw;
+        height: 100vh;
+        object-fit: cover;
+        /*display: block; /* Remove extra space below image */
+        z-index: 1;
+      }
 
-    #gl-canvas, #divcontainer {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 800px;
-      height: 800px;
-    }
+      /* Top banner */
+      .banner {
+        position: fixed;
+        top: 0; left: 0; right: 0;
+        height: 60px;
+        margin: 0;
+        background-color: rgb(11, 61, 145);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+        z-index: 2;
+      }
 
-    #gl-canvas, #divcontainer {
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-    }
+      /* Right panel */
+      .recommendations {
+        position: fixed;
+        top: 76px;
+        right: 16px;
+        width: 240px;
+        background: rgba(31, 30, 30, 0.8);
+        color: #fff;
+        padding: 12px 14px;
+        border: 1px solid rgba(255,255,255,0.25);
+        border-radius: 12px;
+        height: calc((100vh/2) - 76px - 24px);
+        overflow: auto;
+        z-index: 2;
+      }
 
-    /* Top banner */
-    .banner {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      height: 60px;
-      margin: 0;
-      background-color: rgb(11, 61, 145);
-      color: #fff;
-      display: flex;
-      align-items: center;
-      padding: 0 16px;
-      z-index: 2;
-    }
+      .msg {
+        position: fixed;
+        top: 500px;
+        right: 16px;
+        width: 240px;
+        background: rgba(31, 30, 30, 0.8);
+        color: #fff;
+        padding: 12px 14px;
+        border: 1px solid rgba(255,255,255,0.25);
+        border-radius: 12px;
+        height: calc((100vh/6) - 76px - 24px);
+        overflow: auto;
+        z-index: 2;
+      }
 
-    /* Right panel */
-    .recommendations {
-      position: fixed;
-      top: 76px;
-      right: 16px;
-      width: 240px;
-      background: rgba(31, 30, 30, 0.8);
-      color: #fff;
-      padding: 12px 14px;
-      border: 1px solid rgba(255,255,255,0.25);
-      border-radius: 12px;
-      height: calc((100vh/2) - 76px - 24px);
-      overflow: auto;
-      z-index: 2;
-    }
+      .hidden {
+      display: none;
+      }
 
-    .msg {
-      position: fixed;
-      top: 500px;
-      right: 16px;
-      width: 240px;
-      background: rgba(31, 30, 30, 0.8);
-      color: #fff;
-      padding: 12px 14px;
-      border: 1px solid rgba(255,255,255,0.25);
-      border-radius: 12px;
-      height: calc((100vh/6) - 76px - 24px);
-      overflow: auto;
-      z-index: 2;
-    }
+      /* Form overlay */
+      #input {
+        position: fixed;
+        top: 76px;
+        left: 16px;
+        right: 292px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px 14px;
+        align-items: center;
+        color: #fff;
+        background: rgba(0,0,0,0.45);
+        backdrop-filter: blur(4px);
+        padding: 12px 16px;
+        border-radius: 12px;
+        z-index: 2;
+      }
 
-    /* Form overlay */
-    #input {
-      position: fixed;
-      top: 76px;
-      left: 16px;
-      right: 292px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px 14px;
-      align-items: center;
-      color: #fff;
-      background: rgba(0,0,0,0.45);
-      backdrop-filter: blur(4px);
-      padding: 12px 16px;
-      border-radius: 12px;
-      z-index: 2;
-    }
+      #input label { margin-right: 4px; white-space: nowrap; }
 
-    #input label { margin-right: 4px; white-space: nowrap; }
+      #input input,
+      #input select,
+      #input button {
+        padding: 6px 10px;
+        border-radius: 8px;
+        border: 1px solid rgba(255,255,255,0.35);
+        background: rgba(0,0,0,0.35);
+        color: #fff;
+      }
 
-    #input input,
-    #input select,
-    #input button {
-      padding: 6px 10px;
-      border-radius: 8px;
-      border: 1px solid rgba(255,255,255,0.35);
-      background: rgba(0,0,0,0.35);
-      color: #fff;
-    }
+      /* Bottom-left playback controls */
+      #controls {
+        position: fixed;
+        left: 16px;
+        bottom: 16px;
+        display: flex;
+        gap: 10px;
+        background: rgba(0,0,0,0.45);
+        backdrop-filter: blur(4px);
+        padding: 10px 12px;
+        border-radius: 12px;
+        z-index: 2;
+      }
 
-    /* Bottom-left playback controls */
-    #controls {
-      position: fixed;
-      left: 16px;
-      bottom: 16px;
-      display: flex;
-      gap: 10px;
-      background: rgba(0,0,0,0.45);
-      backdrop-filter: blur(4px);
-      padding: 10px 12px;
-      border-radius: 12px;
-      z-index: 2;
-    }
+      #controls button {
+        padding: 20px 40px;
+        font-size: 18px;
+        border-radius: 8px;
+        border: 1px solid rgba(255,255,255,0.35);
+        background: rgba(0,0,0,0.35);
+        color: #fff;
+        cursor: pointer;
+      }
+      #controls button:hover { background: rgba(255,255,255,0.1); }
+    </style>
+    <script src="/socket.io/socket.io.js" defer></script>
+    <script src="roverCam.js" defer></script>
+  </head>
+  <body>
 
-    #controls button {
-      padding: 20px 40px;
-      font-size: 18px;
-      border-radius: 8px;
-      border: 1px solid rgba(255,255,255,0.35);
-      background: rgba(0,0,0,0.35);
-      color: #fff;
-      cursor: pointer;
-    }
-    #controls button:hover { background: rgba(255,255,255,0.1); }
-  </style>
-</head>
-<body>
-  <h1 class="banner">NASA Rover Vision</h1>
+    <h1 class="banner">NASA Rover Vision</h1>
 
-  <div class="recommendations">
-    <p id="rovername"></p>
-    <div id="add"></div>
-  </div>
+    <div class="recommendations">
+      <p id="rovername"></p>
+      <div id="add"></div>
+    </div>
 
-  <div class="msg">
-    <p id="errors"></p>
-  </div>
+    <div class="msg">
+      <p id="errors"></p>
+    </div>
 
-  <div id="input">
-    <label for="rover">Rover:</label>
-    <select id="rover" name="rover">
-      <option value="">Please select a rover</option>
-      <option value="curiosity">Curiosity</option>
-      <option value="opportunity">Opportunity</option>
-      <option value="spirit">Spirit</option>
-      <option value="perseverance">Perseverance</option>
-    </select>
+    <div id="input">
+      <label for="rover">Rover:</label>
+      <select id="rover" name="rover">
+        <option value="">Please select a rover</option>
+        <option value="curiosity">Curiosity</option>
+        <option value="opportunity">Opportunity</option>
+        <option value="spirit">Spirit</option>
+        <option value="perseverance">Perseverance</option>
+      </select>
 
-    <label for="day">Sol day</label>
-    <input id="day" type="text" name="day">
+      <label for="day">Sol day</label>
+      <input id="day" type="text" name="day">
 
-    <button id="getCams">Get available cameras</button>
+      <button id="getCams" aria-label="Get available cameras for selected rover and day">Get available cameras</button>
 
-    <label for="camera">Available Cameras:</label>
-    <select id="camera" name="camera"></select>
+      <label for="camera">Available Cameras:</label>
+      <select id="camera" name="camera"></select>
 
-    <button id="submit">submit</button>
-  </div>
+      <button id="submit" aria-label="Submit rover and camera selection">submit</button>
+    </div>
 
-  <canvas id="gl-canvas" width="800" height="800">
-  <!-- This message shows up only if the Canvas element isn't supported -->
-      HTML5 canvas not supported in your browser!
-  </canvas>
-  <div id="divcontainer"></div>
+    <div id="canvas-labels"></div>
+    <canvas id="gl-canvas" width="800" height="800">
+    <!-- This message shows up only if the Canvas element isn't supported -->
+        HTML5 canvas not supported in your browser!
+    </canvas>
 
-  <div id="controls">
-    <button id="previous">prev</button>
-    <button id="next">next</button>
-    <button id="timelapse">timelapse</button>
-    <button id="pause">pause</button>
+    <div id="controls">
+      <button id="previous" aria-label="Previous image">prev</button>
+      <button id="next" aria-label="Next image">next</button>
+      <button id="timelapse" aria-label="Start timelapse">timelapse</button>
+      <button id="pause-main" aria-label="Pause playback">pause</button>
+      <button id="vote" class="hidden" aria-label="Vote button">vote</button>
+      <input type="range" min="100" max="1000" value="700" id="speedRange">
+      <p>Speed: <span id="sliderValue"></span></p>
+    </div>
 
-    <input type="range" min="100" max="1000" value="700" id="speedRange">
-    <p>Speed: <span id="sliderValue"></span></p>
-  </div>
-  <div id="chatbox">
-    <div id="chat-messages"></div>
-    <form id="chat-form"> <input id="chat-input" type="text" placeholder="Type a message…"> <button
-        type="submit">Send</button> </form>
-      <button id="pause">pause</button>
-    <button id="vote" style="display: none;">vote</button>
-  </div>
+    <div id="chat-box">
+      <div id="chat-messages"></div>
+      <form id="chat-form">
+        <input id="chat-input" type="text" placeholder="Type a message…">
+        <button type="submit" aria-label="Send message">Send</button>
+      </form>
+      <div id="poll-timer">
+      Time left in poll: <span id="seconds-left"></span>
+      </div>
+    </div>
 
-  <script src="/socket.io/socket.io.js"></script>
-  <script src="https://greggman.github.io/webgl-lint/webgl-lint.js" crossorigin></script>
-  <script type="text/javascript" src="webgl-resources/Common/initShaders2.js"></script>
-  <script type="text/javascript" src="webgl-resources/Common/MVnew.js"></script>
-  <script type="text/javascript" src="webgl-resources/SMFModel.js"></script>
-  <script type="text/javascript" src="webgl-resources/PointLightSource.js"></script>
-  <script type="text/javascript" src="webgl-resources/Material.js"></script>
-  <script type="text/javascript" src="webgl-resources/SphereMarker.js"></script>
-  <script type="text/javascript" src="webgl-resources/marsScene.js"></script>
-  <script src="roverCam.js"></script>
-</body>
-
+  </body>
 </html>

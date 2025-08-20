@@ -3,7 +3,7 @@ let images = document.getElementById("photos");
 let nextButton = document.getElementById("next");
 let prevButton = document.getElementById("previous");
 let timelapseButton = document.getElementById("timelapse");
-let pauseButton = document.getElementById("pause");
+let pauseButton = document.getElementById("pause-main");
 let cameraOptions = document.getElementById("camera");
 let errosMsg = document.getElementById("errors");
 let slider = document.getElementById("speedRange");
@@ -164,12 +164,51 @@ prevButton.addEventListener("click", prevButtonClicked);
 pauseButton.addEventListener("click", stopInterval);
 timelapseButton.addEventListener("click", timelaspe);
 
-const socket = io();
+const userColors = {};
+const socket = io({
+  auth: {
+    serverOffset: 0
+  },
+  // enable retries
+  ackTimeout: 10000,
+  retries: 3,
+});
 
-function voteBtnClicked() {
-  const voteBtn = document.getElementById("vote");
+let counter = 0;
+let paused = false;
+let pollDuration = 0;
 
-  const userId = socket.id; // TODO: change
+const pollTimerEl = document.getElementById("poll-timer");
+const secondsEl = document.getElementById("seconds-left");
+
+function hashStringToInt(str) {
+  const p = 31;
+  const m = 1e9 + 9;
+  let hash_value = 0;
+  let p_pow = 1;
+
+  for (let i = 0; i < str.length; i++) {
+    const c = str[i];
+    hash_value = (hash_value + (c.charCodeAt(0) - 'a'.charCodeAt(0) + 1) * p_pow) % m;
+    p_pow = (p_pow * p) % m;
+  }
+
+  return hash_value;
+}
+
+function getUserColor(username) {
+  if (!userColors[username]) {
+    const hash = hashStringToInt(username);
+    const hue = hash % 360;
+    userColors[username] = `hsl(${hue}, 70%, 70%)`;
+  }
+  return userColors[username];
+}
+
+function voteButtonClicked() {
+  const voteButton = document.getElementById("vote");
+
+  const userId      = socket.id; // TODO: change
   const dayValue    = document.getElementById("day").value;
   const roverValue  = document.getElementById("rover").value;
   const cameraValue = document.getElementById("camera").value;
@@ -182,32 +221,102 @@ function voteBtnClicked() {
 
   socket.emit('userVote', voteData, (response) => {
     if (response.success) {
-      voteBtn.disabled = true;
-      voteBtn.style.display = "none";
+      voteButton.disabled = true;
+      voteButton.classList.add('hidden');
     } else {
-      voteBtn.disabled = false;
-      voteBtn.style.display = "inline";
+      voteButton.disabled = false;
+      voteButton.classList.remove('hidden');
     }
   });
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  const voteBtn = document.getElementById("vote");
-  voteBtn.disabled = true;
-  voteBtn.style.display = "none";
+  const voteButton = document.getElementById("vote");
+  const form = document.getElementById('chat-form');
+  const input = document.getElementById('chat-input');
 
-  voteBtn.addEventListener('click', voteBtnClicked);
+  voteButton.addEventListener('click', voteButtonClicked);
 
-  socket.on('pollOpen', () => {
-    voteBtn.disabled = false;
-    voteBtn.style.display = "inline";
-    console.log("Poll is now open");
+  form.addEventListener('submit', (e) => {
+    e.preventDefault(); // Prevent page reload on form submit
+    if (input.value) {
+      const clientOffset = `${socket.id}-${counter++}`;
+      const timeStamp = new Date().toISOString();
+      socket.emit('chat message', socket.id, input.value, clientOffset, timeStamp, acknowledgementCallback);
+      input.value = '';
+    }
   });
 
-  socket.on('pollClosed', () => {
-    voteBtn.disabled = true;
-    voteBtn.style.display = "none";
+  socket.on('chat message', (user, msg, serverOffset) => {
+    const chatLine = document.createElement('div');
+    chatLine.classList.add('chat-line');
+
+    const usernameSpan = document.createElement('span');
+    usernameSpan.classList.add('username');
+    usernameSpan.textContent = `${user}:`;
+    usernameSpan.style.color = getUserColor(user);
+
+    const messageSpan = document.createElement('span');
+    messageSpan.classList.add('text');
+    messageSpan.textContent = ` ${msg}`;
+
+    chatLine.appendChild(usernameSpan);
+    chatLine.appendChild(messageSpan);
+    document.getElementById('chat-messages').appendChild(chatLine);
+
+    const chatMessages = document.getElementById('chat-messages');
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    socket.auth.serverOffset = serverOffset;
+  });
+
+  socket.on('pollOpen', (allocatedTime) => {
+    voteButton.disabled = false;
+    voteButton.classList.remove('hidden');
+    console.log("Poll is now open");
+    pollDuration = allocatedTime;
+    updatePollTimer(true);
+  });
+
+  socket.on('pollClosed', (allocatedTime) => {
+    voteButton.disabled = true;
+    voteButton.classList.add('hidden');
     console.log("Poll is now closed");
+    pollDuration = allocatedTime;
+    updatePollTimer(false);
   });
 });
 
+function acknowledgementCallback(ack) {
+  console.log('Ack received:', ack);
+  if (ack && ack.success) {
+    console.log('Acknowledged: stop retrying');
+  } else {
+    console.error('Acknowledgment failed, will retry...');
+  }
+}
+
+function updatePollTimer(isPollActive) {
+  const minutes = Math.floor(pollDuration / 60);
+  const seconds = Math.floor(pollDuration % 60);
+  const formatted = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+  if (isPollActive) {
+    secondsEl.textContent = formatted;
+  } else {
+    pollTimerEl.textContent = `Next poll in: ${formatted}`;
+    secondsEl.classList.remove('hidden');
+  }
+
+  if (pollDuration > 0) {
+    pollDuration--;
+    setTimeout(() => updatePollTimer(isPollActive), 1000);
+  } else {
+    if (isPollActive) {
+      pollTimerEl.textContent = "Poll Closed";
+      secondsEl.classList.add('hidden');
+    } else {
+      pollTimerEl.textContent = "Next poll starting…";
+    }
+  }
+}

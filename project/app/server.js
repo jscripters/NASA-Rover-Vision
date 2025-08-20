@@ -12,12 +12,9 @@ const path = require('path');
 let port = 3000;
 let hostname = "localhost";
 
-
-let express = require("express");
 const { createServer } = require("node:http");
 const { startSocketConnection }  = require("./socket/socket.js");
 
-const app = express();
 const server = createServer(app);
 
 startSocketConnection(server);
@@ -138,11 +135,6 @@ app.post("/login", async (req, res) => {
     console.error(error);
     res.status(500).json({ error: 'Login failed.' });
   }
-});
-
-
-app.get('/chat', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public/chat.html'));
 });
 
 server.listen(port, hostname, () => {

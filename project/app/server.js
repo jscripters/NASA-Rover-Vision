@@ -13,11 +13,9 @@ let port = 3000;
 let hostname = "localhost";
 
 
-let express = require("express");
 const { createServer } = require("node:http");
 const { startSocketConnection }  = require("./socket/socket.js");
 
-const app = express();
 const server = createServer(app);
 
 startSocketConnection(server);

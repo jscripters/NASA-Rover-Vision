@@ -1,4 +1,8 @@
 {
+    "api_key": "Kwh9G3KWUmupCGLsCTYdAK1nfOZD4TfCIENwMhg6",
+    "api_url": "https://api.nasa.gov/mars-photos/api/v1/"
+}
+{
     "api_key": "DEMO_KEY",
     "api_url": "https://api.nasa.gov/mars-photos/api/v1/",
     "db": {

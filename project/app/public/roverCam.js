@@ -136,6 +136,16 @@ getCams.addEventListener("click", () => {
   }
 });
 
+function nextButtonClicked() {
+  if (isIntervalOn) { stopInterval(); }
+  getNextPhotos();
+}
+
+function prevButtonClicked() {
+  if (isIntervalOn) { stopInterval(); }
+  getPrevPhotos();
+}
+
 let photosArr = [];
 let firstClick = true;
 function submitClick() {
@@ -148,18 +158,56 @@ function submitClick() {
   firstClick = false;
 }
 
-slider.addEventListener('input', function() {
-  speed = parseInt(this.value);
-  //console.log("speed",speed)
-  if(isIntervalOn){
-    stopInterval()
-    timelaspe()
-  }
-
-});
-
 button.addEventListener("click", submitClick);
 nextButton.addEventListener("click", nextButtonClicked);
 prevButton.addEventListener("click", prevButtonClicked);
 pauseButton.addEventListener("click", stopInterval);
 timelapseButton.addEventListener("click", timelaspe);
+
+const socket = io();
+
+function voteBtnClicked() {
+  const voteBtn = document.getElementById("vote");
+
+  const userId = socket.id; // TODO: change
+  const dayValue    = document.getElementById("day").value;
+  const roverValue  = document.getElementById("rover").value;
+  const cameraValue = document.getElementById("camera").value;
+
+  if (!dayValue || !roverValue || !cameraValue) {
+    return;
+  }
+
+  const voteData = {userId, dayValue, roverValue, cameraValue};
+
+  socket.emit('userVote', voteData, (response) => {
+    if (response.success) {
+      voteBtn.disabled = true;
+      voteBtn.style.display = "none";
+    } else {
+      voteBtn.disabled = false;
+      voteBtn.style.display = "inline";
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  const voteBtn = document.getElementById("vote");
+  voteBtn.disabled = true;
+  voteBtn.style.display = "none";
+
+  voteBtn.addEventListener('click', voteBtnClicked);
+
+  socket.on('pollOpen', () => {
+    voteBtn.disabled = false;
+    voteBtn.style.display = "inline";
+    console.log("Poll is now open");
+  });
+
+  socket.on('pollClosed', () => {
+    voteBtn.disabled = true;
+    voteBtn.style.display = "none";
+    console.log("Poll is now closed");
+  });
+});
+

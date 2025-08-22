@@ -19,6 +19,7 @@ const socket = io({
 let counter = 0;
 let paused = false;
 let pollDuration = 0;
+let isPollActive = false;
 
 const pollTimerElm = document.getElementById("poll-timer");
 const secondsElm   = document.getElementById("seconds-left");
@@ -244,6 +245,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const input = document.getElementById('chat-input');
 
   voteButton.addEventListener('click', voteButtonClicked);
+  updatePollTimer();
 
   form.addEventListener('submit', (e) => {
     e.preventDefault(); // Prevent page reload on form submit
@@ -283,7 +285,7 @@ document.addEventListener('DOMContentLoaded', function() {
     voteButton.classList.remove('hidden');
     //console.log("Poll is now open");
     pollDuration = allocatedTime;
-    updatePollTimer(true);
+    isPollActive = true;
   });
 
   socket.on('pollClosed', (allocatedTime) => {
@@ -291,7 +293,7 @@ document.addEventListener('DOMContentLoaded', function() {
     voteButton.classList.add('hidden');
     //console.log("Poll is now closed");
     pollDuration = allocatedTime;
-    updatePollTimer(false);
+    isPollActive = false;
   });
 });
 
@@ -304,7 +306,8 @@ function acknowledgementCallback(ack) {
   }
 }
 
-function updatePollTimer(isPollActive) {
+function updatePollTimer() {
+  console.log("This is a test");
   const minutes = Math.floor(pollDuration / 60);
   const seconds = Math.floor(pollDuration % 60);
   const formatted = `${minutes}:${seconds.toString().padStart(2, '0')}`;
@@ -316,6 +319,7 @@ function updatePollTimer(isPollActive) {
 
   if (pollDuration > 0) {
     pollDuration--;
-    setTimeout(() => updatePollTimer(isPollActive), 1000);
   }
+
+  setTimeout(() => updatePollTimer(), 1000);
 }

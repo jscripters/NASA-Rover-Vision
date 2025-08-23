@@ -47,13 +47,14 @@
       z-index: 2;
     }
 
-    .button-container{
+    .button-container {
       position: absolute;
       top: 95%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 200px;
-      height: 100px;
+      display: flex;            
+      gap: 20px;                
+      justify-content: center; 
     }
 
     .button-container button {
@@ -76,6 +77,7 @@
   <div id="divcontainer"></div>
 
   <div class="button-container">
+    <button onclick="location.href='introduction.html'">Introduction</button>
     <button onclick="location.href='roverCam.html'">Explore Mars</button>
   </div>    
   <script src="https://greggman.github.io/webgl-lint/webgl-lint.js" crossorigin></script>

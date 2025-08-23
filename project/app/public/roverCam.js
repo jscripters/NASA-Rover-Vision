@@ -316,7 +316,6 @@ function acknowledgementCallback(ack) {
 }
 
 function updatePollTimer() {
-  console.log("This is a test");
   const minutes = Math.floor(pollDuration / 60);
   const seconds = Math.floor(pollDuration % 60);
   const formatted = `${minutes}:${seconds.toString().padStart(2, '0')}`;

@@ -198,7 +198,7 @@ class SMFModel {
       gl.uniform1i(gl.getUniformLocation(this._shaderProgram, 'uTexture'), 0);
     } else {
       // fallback or skip drawing texture
-      console.warn('Texture not loaded yet');
+      // console.warn('Texture not loaded yet');
       return;
     }
 

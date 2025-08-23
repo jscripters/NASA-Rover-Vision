@@ -49,7 +49,6 @@ async function fetchShader(url) {
 window.onload = async function init(){
   canvas = document.getElementById('gl-canvas');
   gl = canvas.getContext('webgl2');
-  console.log("Max texture size:", gl.getParameter(gl.MAX_TEXTURE_SIZE));
 
   gl.viewport(0, 0, canvas.width, canvas.height);
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
@@ -80,7 +79,7 @@ window.onload = async function init(){
   const model = await fetchShader('/webgl-resources/models/sphere.smf');
   const gouraudShaderProgram = initShadersFromSource(gl, gouraudVertShader, gouraudFragShader);
 
-  smfModel = new SMFModel(gl, model, '/webgl-resources/textures/8k_mars.jpg', gouraudShaderProgram);
+  smfModel = new SMFModel(gl, model, '/webgl-resources/textures/5672_mars_4k_color.jpg', gouraudShaderProgram);
   smfModel.setPerspective(45 * Math.PI / 180, canvas.width / canvas.height, 0.1, 1000.0);
   smfModel.configureMaterialProperties(marsMaterial, [cameraLightSource]);
 

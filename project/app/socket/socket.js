@@ -141,7 +141,7 @@ async function startVotingSession(allocatedTime) {
   await new Promise(resolve => setTimeout(resolve, allocatedTime));
 
   pollActive = false;
-  result = await getPollWinner('votes', 'rover');
+  result = await getPollWinner('votes', 'rover', 'day', 'camera');
   console.log("Result: ", result);
 
   nextPollStartTime = Date.now() + 10 * 60 * 1000;
@@ -150,7 +150,7 @@ async function startVotingSession(allocatedTime) {
   return result;
 }
 
-async function getPollWinner(tableName, columnName) {
+async function getPollWinner(tableName, columnName , day, cameraName) {
   const cols = await db.all(`PRAGMA table_info(${tableName});`);
   const colNames = cols.map(c => c.name);
 
@@ -158,14 +158,14 @@ async function getPollWinner(tableName, columnName) {
     throw new Error(`Column ${columnName} does not exist in ${tableName}`);
   }
 
+
   const row = await db.get(
-    `SELECT ${columnName} as value, COUNT(*) as count
+    `SELECT ${columnName}, ${day}, ${cameraName} , COUNT(*) as count
      FROM ${tableName}
      GROUP BY ${columnName}
      ORDER BY count DESC
      LIMIT 1`
   );
-
   return row;
 }
 

@@ -3,8 +3,9 @@ const sqlite3 = require('sqlite3').verbose();
 const { open } = require('sqlite');
 
 let pollActive = false;
-let pollStartTime = false;
-let pollDuration = false;
+let pollStartTime;
+let pollDuration;
+let nextPollStartTime;
 let io;
 let db;
 
@@ -56,23 +57,24 @@ async function setupSocket(server) {
     }
 
     if (pollActive) {
-      const elapsed = Date.now() - pollStartTime;
-      const remaining = Math.max(0, pollDuration - elapsed);
-
-      if (remaining > 0) {
-        socket.emit("pollOpen");
-      } else {
-        socket.emit("pollClosed");
-      }
+      const remaining = getTimeLeftInPoll();
+      if (remaining > 0)
+        socket.emit("pollOpen", remaining / 1000);
+      else
+        socket.emit("pollClosed", getTimeUntilNextPoll());
+    } else {
+      socket.emit("pollClosed", getTimeUntilNextPoll());
     }
 
     socket.on('chat message', async (username, msg, client_offset, timeStamp, callback) => {
+      console.log(username, msg, client_offset);
+      console.log('Received callback:', typeof callback);
       let result;
       try {
         result = await db.run('INSERT INTO messages (username, content, client_offset, timestamp) VALUES (?, ?, ?, ?)', username, msg, client_offset, timeStamp);
       } catch (e) {
         if (e.errno === 19) {
-          callback({ success: false, error: err.message });
+          callback({ success: false, error: e.message });
         } else {
           console.error(e);
           callback({ success: false, error: 'An error occurred' });
@@ -120,7 +122,6 @@ async function setupSocket(server) {
       }
     });
 
-
       socket.on('disconnect', () => {});
     });
 
@@ -135,19 +136,21 @@ async function startVotingSession(allocatedTime) {
   let result = null;
 
   await db.run(`DELETE FROM votes`);
-  io.emit("pollOpen");
+  io.emit("pollOpen", allocatedTime / 1000);
 
   await new Promise(resolve => setTimeout(resolve, allocatedTime));
 
   pollActive = false;
-  result = await getPollWinner('votes', 'rover');
+  result = await getPollWinner('votes', 'rover', 'day', 'camera');
   console.log("Result: ", result);
-  io.emit("pollClosed")
+
+  nextPollStartTime = Date.now() + 10 * 60 * 1000;
+  io.emit("pollClosed", getTimeUntilNextPoll());
 
   return result;
 }
 
-async function getPollWinner(tableName, columnName) {
+async function getPollWinner(tableName, columnName , day, cameraName) {
   const cols = await db.all(`PRAGMA table_info(${tableName});`);
   const colNames = cols.map(c => c.name);
 
@@ -155,14 +158,14 @@ async function getPollWinner(tableName, columnName) {
     throw new Error(`Column ${columnName} does not exist in ${tableName}`);
   }
 
+
   const row = await db.get(
-    `SELECT ${columnName} as value, COUNT(*) as count
+    `SELECT ${columnName}, ${day}, ${cameraName} , COUNT(*) as count
      FROM ${tableName}
      GROUP BY ${columnName}
      ORDER BY count DESC
      LIMIT 1`
   );
-
   return row;
 }
 
@@ -178,6 +181,27 @@ async function startVotingCycle() {
 async function startSocketConnection(server) {
   await setupSocket(server);
   startVotingCycle();
+}
+
+function broadcastPollState() {
+  if (pollActive) {
+    io.emit("pollOpen", getTimeLeftInPoll);
+  } else {
+    io.emit("pollClosed", getTimeUntilNextPoll);
+  }
+}
+
+function getTimeUntilNextPoll() {
+  if (pollActive) return null;
+  const remaining = nextPollStartTime - Date.now();
+  return Math.max(0, Math.floor(remaining / 1000));
+}
+
+function getTimeLeftInPoll() {
+  if (!pollActive) return null;
+  const elapsed = Date.now() - pollStartTime;
+  const remaining = Math.max(0, pollDuration * 1000 - elapsed);
+  return Math.floor(remaining / 1000);
 }
 
 module.exports = { startSocketConnection };

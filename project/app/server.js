@@ -124,11 +124,6 @@ app.post("/login", async (req, res) => {
   }
 });
 
-
-app.get('/chat', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public/chat.html'));
-});
-
 server.listen(port, hostname, () => {
   console.log(`http://${hostname}:${port}`);
 });

@@ -12,6 +12,7 @@ const path = require('path');
 let port = 3000;
 let hostname = "localhost";
 
+
 const { createServer } = require("node:http");
 const { startSocketConnection }  = require("./socket/socket.js");
 
@@ -52,20 +53,6 @@ app.get("/getManifest", (req, res) => {
 app.get("/", (req, res) => {
   console.log("Sending login.html");
   res.sendFile("public/login.html", { root: __dirname });
-});
-
-app.get("/getManifest", (req, res) => {
-  let rover = req.query.rover;
-  let url = `${baseUrl}manifests/${rover}?api_key=${apiKey}`;
-  axios.get(url).then((response) => {
-    //console.log("Received response manifest:", response.data.photo_manifest.photos);
-    res.json(response.data.photo_manifest.photos);
-  }).catch(error => {
-    console.log(error.message);
-    let errorCode = parseInt(error.code);
-    res.status(errorCode).json({"error":error.message});
-  });
-  console.log(`Sending request to: ${url}`);
 });
 
 app.get("/getPhotos", (req, res) => {

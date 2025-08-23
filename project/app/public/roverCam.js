@@ -189,6 +189,15 @@ nextButton.addEventListener("click", nextButtonClicked);
 prevButton.addEventListener("click", prevButtonClicked);
 pauseButton.addEventListener("click", stopInterval);
 timelapseButton.addEventListener("click", timelaspe);
+slider.addEventListener('input', function() {
+  speed = parseInt(this.value);
+  //console.log("speed",speed)
+  if(isIntervalOn){
+    stopInterval()
+    timelaspe()
+  }
+
+});
 
 function hashStringToInt(str) {
   const p = 31;

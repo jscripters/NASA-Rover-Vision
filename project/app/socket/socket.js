@@ -146,6 +146,7 @@ async function startVotingSession(allocatedTime) {
 
   nextPollStartTime = Date.now() + 10 * 60 * 1000;
   io.emit("pollClosed", getTimeUntilNextPoll());
+  io.emit("sendResult", result);
 
   return result;
 }

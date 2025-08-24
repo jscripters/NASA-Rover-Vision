@@ -7,6 +7,43 @@ const socket = io({
   retries: 3,
 });
 
-socket.on('sendResult',data=>{
-  console.log("test result:",data);
-})
+let votedDay;
+let srcArr =[];
+let images = document.getElementById("photos");
+let currentSrc=0;
+let interval;
+
+isIntervalOn = false;
+function timelaspe() {
+  if(isIntervalOn == false){
+    interval = setInterval(function () {
+      getNextPhotos();
+    }, 500);
+    isIntervalOn = true;
+  }
+}
+
+function getNextPhotos() {
+  if (currentSrc < srcArr.length) {
+    images.src = srcArr[currentSrc];
+    currentSrc += 1;
+  } else {
+    currentSrc = 0;
+  }
+}
+
+console.log("srcarr:",srcArr);
+function submit(photoArr) {
+  let url = `/getVotedDay`;
+  fetch(url).then((response) => response.json())
+    .then((body) => {
+      let maxLen = body.photos.length;
+      console.log(body)
+      for (let i = 0; i < maxLen; i++) {
+        const imageSource = body.photos[i].img_src.toString();
+        photoArr.push(imageSource);
+      }
+      timelaspe()
+    }).catch(error => console.log(error));
+}
+submit(srcArr)

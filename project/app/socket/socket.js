@@ -8,7 +8,15 @@ let pollDuration;
 let nextPollStartTime;
 let io;
 let db;
+let pollWinner
 
+function getResult(){
+  return pollWinner;
+}
+
+function setResult(value){
+  pollWinner=value;
+}
 async function setupSocket(server) {
   io = new Server(server, { connectionStateRecovery: {} });
 
@@ -146,7 +154,7 @@ async function startVotingSession(allocatedTime) {
 
   nextPollStartTime = Date.now() + 10 * 60 * 1000;
   io.emit("pollClosed", getTimeUntilNextPoll());
-  io.emit("sendResult", result);
+  setResult(result)
 
   return result;
 }
@@ -205,4 +213,4 @@ function getTimeLeftInPoll() {
   return Math.floor(remaining / 1000);
 }
 
-module.exports = { startSocketConnection };
+module.exports = { startSocketConnection,getResult,setResult };

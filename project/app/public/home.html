@@ -67,15 +67,25 @@
       cursor: pointer;
     }
 
+    #showcase{
+      position: absolute;
+      top: 10%;
+      left: 5%;
+      z-index: 100;
+    }
+
   </style>
 </head>
 <body>
 
   <h1 class="banner">Welcome to NASA Rover Vision</h1>
-    <canvas id="gl-canvas" width="800" height="800">
-    </canvas>
+    <canvas id="gl-canvas" width="800" height="800"></canvas>
   <div id="divcontainer"></div>
 
+  <div id="showcase">
+    <img id="photos" src="" width="350" height="250">
+    <div style="color: #fff;">Community voted sol day</div>
+  </div>
   <div class="button-container">
     <button onclick="location.href='introduction.html'">Introduction</button>
     <button onclick="location.href='roverCam.html'">Explore Mars</button>

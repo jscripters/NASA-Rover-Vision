@@ -32,7 +32,7 @@ const RoverLocations = {
   curiosity: vec2(4.5895, 137.4417),
   opportunity: vec2(-1.9462, 354.4734),
   spirit: vec2(-14.5684, 175.472636),
-  phoenix: vec2(68.2188, 234.2500)
+  perseverance: vec2(18.4446, 77.4509)
 };
 
 var markers = [];
@@ -140,3 +140,10 @@ function markerModelMatrixFromLatLon(lat, lon, radius, viewMatrix) {
 function updateCameraTheta() { degrees += thetaStep }
 
 function initEventHandlers() {}
+
+window.addEventListener('resize', () => {
+  for (const marker of markers) {
+    marker._lastX = null;
+    marker._lastY = null;
+  }
+});

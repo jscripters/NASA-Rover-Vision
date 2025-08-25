@@ -145,19 +145,26 @@ class SphereMarker {
   }
 
   renderText(modelViewMatrix, projectionMatrix) {
-    const gl = this.gl;
-    let point = vec4(this.radius, 0, 0, 1);
-
+    const point = vec4(this.radius, 0, 0, 1);
     let clipspace = mult(projectionMatrix, mult(modelViewMatrix, point));
+
     clipspace[0] /= clipspace[3];
     clipspace[1] /= clipspace[3];
 
-    const rect = this.gl.canvas.getBoundingClientRect();  // actual position & size
-    let pixelX = (clipspace[0] * 0.5 + 0.5) * rect.width + rect.left;
-    let pixelY = (clipspace[1] * -0.5 + 0.5) * rect.height + rect.top;
+    const rect = this.gl.canvas.getBoundingClientRect();
+    const targetX = (clipspace[0] * 0.5 + 0.5) * rect.width + rect.left + window.scrollX;
+    const targetY = (clipspace[1] * -0.5 + 0.5) * rect.height + rect.top + window.scrollY - 10;
 
-    this.div.style.left = Math.floor(pixelX) + "px";
-    this.div.style.top  = Math.floor(pixelY) + "px";
+    if (!this._lastX) this._lastX = targetX;
+    if (!this._lastY) this._lastY = targetY;
+
+    const smoothFactor = 0.05;
+    this._lastX += (targetX - this._lastX) * smoothFactor;
+    this._lastY += (targetY - this._lastY) * smoothFactor;
+
+    this.div.style.left = `${this._lastX}px`;
+    this.div.style.top  = `${this._lastY}px`;
+
     this.textNode.nodeValue = this.name;
   }
 }

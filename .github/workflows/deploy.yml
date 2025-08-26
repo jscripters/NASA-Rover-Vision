@@ -38,22 +38,10 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           shell: powershell
           script: |
-            Write-Host "Logging into Docker Hub..."
             docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-            Write-Host "Pulling latest image..."
+            docker ps
             docker pull tkg36/mars-rover-vision:latest
-
-            Write-Host "Existing containers:"
-            docker ps -a
-
-            Write-Host "Stopping old container (if exists)..."
-            docker stop mars-container || exit 0
-
-            Write-Host "Removing old container (if exists)..."
-            docker rm mars-container || exit 0
-
-            Write-Host "Starting new container..."
+            docker stop mars-container
+            docker rm mars-container
             docker run -d -e LISTEN_IP=0.0.0.0 --name mars-container -p 80:3000 tkg36/mars-rover-vision:latest
-            
-            Write-Host "Running containers:"
             docker ps

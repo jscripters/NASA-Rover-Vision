@@ -3,7 +3,7 @@ let express = require("express");
 let session = require('express-session');
 let bcrypt = require('bcrypt');
 let app = express();
-let apiFile = require("/app/env.json");
+let apiFile = require("../env.json");
 let { Pool } = require("pg");
 let pool = new Pool(apiFile.db);
 let apiKey = apiFile["api_key"];
@@ -20,16 +20,21 @@ const server = createServer(app);
 
 startSocketConnection(server);
 
-
-app.use(express.static("public"));
-app.use(express.json());
-
 app.use(session({
   secret: 'jscripters2025',
   resave: false,
   saveUninitialized: false,
   cookie: { secure: false }
 }));
+
+app.use(express.static(path.join(__dirname, "public")));
+
+function requireLogin(req, res, next) {
+  if (!req.session.user) {
+    return res.redirect('/login.html');
+  }
+  next();
+}
 
 app.get("/", (req, res) => {
   console.log("Sending login.html");
@@ -90,6 +95,10 @@ app.get("/getVotedDay", (req, res) => {
   });
 });
 
+app.get("/roverCam.html", requireLogin, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/roverCam.html'));
+});
+
 app.post("/createAccount", async (req, res) => {
 
   const { username, password } = req.body;
@@ -104,6 +113,10 @@ app.post("/createAccount", async (req, res) => {
       "INSERT INTO users (username, passwords) VALUES ($1, $2) RETURNING id",
       [username, hashedPassword]
     );
+
+    req.session.userId = result.rows[0].id;
+    req.session.username = username;
+
     res.json({ message: "Account created successfully." });
   } catch (error) {
     if (error.code === '23505') {

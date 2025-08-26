@@ -29,13 +29,6 @@ app.use(session({
 
 app.use(express.static(path.join(__dirname, "public")));
 
-function requireLogin(req, res, next) {
-  if (!req.session.user) {
-    return res.redirect('/login.html');
-  }
-  next();
-}
-
 app.get("/", (req, res) => {
   console.log("Sending login.html");
   res.sendFile("public/login.html", { root: __dirname });
@@ -93,10 +86,6 @@ app.get("/getVotedDay", (req, res) => {
     let errorCode = parseInt(error.status);
     res.status(errorCode).json({"error":error.message});
   });
-});
-
-app.get("/roverCam.html", requireLogin, (req, res) => {
-  res.sendFile(path.join(__dirname, 'public/roverCam.html'));
 });
 
 app.post("/createAccount", async (req, res) => {

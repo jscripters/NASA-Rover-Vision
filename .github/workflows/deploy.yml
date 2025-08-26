@@ -37,7 +37,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
-            set DOCKER_HOST=npipe:////./pipe/docker_engine
+            set DOCKER_HOST=tcp://localhost:2375
             docker ps
             docker pull tkg36/mars-rover-vision:latest
             docker ps

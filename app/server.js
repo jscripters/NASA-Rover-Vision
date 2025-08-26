@@ -33,7 +33,7 @@ app.use(session({
 
 app.get("/", (req, res) => {
   console.log("Sending login.html");
-  res.sendFile("public/home.html", { root: __dirname });
+  res.sendFile("public/login.html", { root: __dirname });
 });
 
 

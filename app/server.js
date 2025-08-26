@@ -3,14 +3,14 @@ let express = require("express");
 let session = require('express-session');
 let bcrypt = require('bcrypt');
 let app = express();
-let apiFile = require("../env.json");
+let apiFile = require("/app/env.json");
 let { Pool } = require("pg");
 let pool = new Pool(apiFile.db);
 let apiKey = apiFile["api_key"];
 let baseUrl = apiFile["api_url"];
 const path = require('path');
 let port = 3000;
-let hostname = "localhost";
+let hostname = "0.0.0.0";
 
 
 const { createServer } = require("node:http");

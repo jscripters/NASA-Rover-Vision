@@ -37,7 +37,6 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
-            set -e
             echo "Pulling latest image..."
             docker pull tkg36/mars-rover-vision:latest
 

@@ -32,7 +32,7 @@ function getNextPhotos() {
   }
 }
 
-console.log("srcarr:",srcArr);
+//console.log("srcarr:",srcArr);
 function submit(photoArr) {
   let url = `/getVotedDay`;
   fetch(url).then((response) => response.json())

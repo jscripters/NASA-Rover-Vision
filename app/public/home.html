@@ -2,20 +2,13 @@
 <html>
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Nasa Rover Vision</title>
+  <link rel="stylesheet" type="text/css" href="css/canvas.css">
   <style>
     html, body { margin: 0; padding: 0; height: 100%; }
     body {background-color: black; overflow-x: hidden; font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
-
-    #gl-canvas, #divcontainer {
-      position: absolute;
-      width: 800px;
-      height: 800px;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      background-color: transparent;
-    }
 
     .button-container {
       position: fixed;
@@ -62,13 +55,12 @@
       cursor: pointer;
     }
 
-    #showcase{
-      position: absolute;
-      top: 10%;
-      left: 5%;
-      z-index: 100;
-    }
-
+  #showcase {
+    position: absolute;
+    top: 10%;
+    left: 20px;
+    z-index: 100;
+  }
   </style>
   <script src="/socket.io/socket.io.js"></script>
   <script src="home.js" defer></script>

@@ -75,8 +75,6 @@ async function setupSocket(server) {
     }
 
     socket.on('chat message', async (username, msg, client_offset, timeStamp, callback) => {
-      console.log(username, msg, client_offset);
-      console.log('Received callback:', typeof callback);
       let result;
       try {
         result = await db.run('INSERT INTO messages (username, content, client_offset, timestamp) VALUES (?, ?, ?, ?)', username, msg, client_offset, timeStamp);
@@ -95,8 +93,6 @@ async function setupSocket(server) {
 
     socket.on('userVote', async (voteData, callback) => {
       try {
-        console.log("Received voteData:", voteData);
-
         const { userId, dayValue, roverValue, cameraValue } = voteData;
 
         if (!userId || !dayValue || !roverValue || !cameraValue) {
@@ -108,24 +104,19 @@ async function setupSocket(server) {
           `SELECT * FROM votes WHERE userId = ?`,
           [userId]
         );
-        console.log("Existing vote record for user:", userVoteRecord);
 
         if (userVoteRecord) {
-          console.log(`User ${userId} attempted to vote again`);
           return callback({ success: false, error: 'User has already voted' });
         }
 
-        console.log(`Inserting vote for user ${userId}:`, { dayValue, roverValue, cameraValue });
         await db.run(
           `INSERT INTO votes (userId, day, rover, camera) VALUES (?, ?, ?, ?)`,
           [userId, dayValue, roverValue, cameraValue]
         );
 
-        console.log(`Vote successfully recorded for user ${userId}`);
         return callback({ success: true });
 
       } catch (err) {
-        console.error("Error processing vote:", err);
         return callback({ success: false, error: 'Database error' });
       }
     });
@@ -150,7 +141,6 @@ async function startVotingSession(allocatedTime) {
 
   pollActive = false;
   result = await getPollWinner('votes', 'rover', 'day', 'camera');
-  console.log("Result: ", result);
 
   nextPollStartTime = Date.now() + 10 * 60 * 1000;
   io.emit("pollClosed", getTimeUntilNextPoll());
@@ -180,9 +170,7 @@ async function getPollWinner(tableName, columnName , day, cameraName) {
 
 async function startVotingCycle() {
   while (true) {
-    console.log("Starting new voting session...");
     await startVotingSession(1 * 60 * 1000);
-    console.log("Voting session ended. Waiting 10 minutes...");
     await new Promise(resolve => setTimeout(resolve, 10 * 60 * 1000));
   }
 }

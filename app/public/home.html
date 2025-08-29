@@ -7,19 +7,14 @@
     html, body { margin: 0; padding: 0; height: 100%; }
     body {background-color: black; overflow-x: hidden; font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
 
-    
     #gl-canvas, #divcontainer {
       position: absolute;
-      top: 0;
-      left: 0;
       width: 800px;
       height: 800px;
-    }
-    
-    #gl-canvas, #divcontainer {
       left: 50%;
       top: 50%;
       transform: translate(-50%, -50%);
+      background-color: transparent;
     }
 
     .button-container {
@@ -52,9 +47,9 @@
       top: 95%;
       left: 50%;
       transform: translate(-50%, -50%);
-      display: flex;            
-      gap: 20px;                
-      justify-content: center; 
+      display: flex;
+      gap: 20px;
+      justify-content: center;
     }
 
     .button-container button {
@@ -75,6 +70,8 @@
     }
 
   </style>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="home.js" defer></script>
 </head>
 <body>
 
@@ -83,15 +80,13 @@
   <div id="divcontainer"></div>
 
   <div id="showcase">
-    <img id="photos" src="" width="350" height="250">
+    <img id="photos" src="images/login-page-background.jpg" width="350" height="250">
     <div style="color: #fff;">Community voted sol day</div>
   </div>
   <div class="button-container">
-    <button onclick="location.href='introduction.html'">Introduction</button>
-    <button onclick="location.href='roverCam.html'">Explore Mars</button>
+    <button onclick="location.href='/introduction'">Introduction</button>
+    <button onclick="location.href='/roverCam'">Explore Mars</button>
   </div>
-  <script src="/socket.io/socket.io.js" defer></script>
-  <script src="home.js" defer></script>
   <script src="https://greggman.github.io/webgl-lint/webgl-lint.js" crossorigin></script>
   <script type="text/javascript" src="webgl-resources/Common/initShaders2.js"></script>
   <script type="text/javascript" src="webgl-resources/Common/MVnew.js"></script>
@@ -101,5 +96,4 @@
   <script type="text/javascript" src="webgl-resources/SphereMarker.js"></script>
   <script type="text/javascript" src="webgl-resources/marsScene.js"></script>
 </body>
-
 </html>

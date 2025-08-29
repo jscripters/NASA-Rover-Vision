@@ -61,27 +61,31 @@ app.get("/login", (req, res) => {
   res.sendFile("public/login.html", { root: __dirname });
 });
 
+app.get("/introduction", (req, res) => {
+  res.sendFile("public/introduction.html", { root: __dirname });
+});
+
+app.get("/roverCam", (req, res) => {
+  res.sendFile("public/roverCam.html", { root: __dirname });
+});
+
 app.get("/getPhotos", (req, res) => {
   let rover = req.query.rover;
   let solDay = req.query.solday;
   let camera = req.query.camera || "navcam";
 
-  //console.log(rover,solDay,apiKey)
   let url = `${baseUrl}rovers/${rover}/photos?sol=${solDay}&camera=${camera}&api_key=${apiKey}`;
   axios.get(url).then((response) => {
-    //console.log("Received response:", response.data);
     res.json(response.data);
   }).catch(error => {
     console.log(error.message);
     let errorCode = parseInt(error.status);
     res.status(errorCode).json({"error":error.message});
   });
-  console.log(`Sending request to: ${baseUrl}rovers/${rover}/photos?sol=${solDay}&camera=${camera}`);
 });
 
 app.get("/getVotedDay", (req, res) => {
   let test = getResult();
-  console.log("dsfdsfs",test);
   let url = `${baseUrl}rovers/${"curiosity"}/photos?sol=${950}&camera=${"navcam"}&api_key=${apiKey}`;
   if(test != undefined){
     url = `${baseUrl}rovers/${test.rover}/photos?sol=${test.day}&camera=${test.camera}&api_key=${apiKey}`

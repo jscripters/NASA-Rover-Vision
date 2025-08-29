@@ -3,7 +3,7 @@ let express = require("express");
 let session = require('express-session');
 let bcrypt = require('bcrypt');
 let app = express();
-let apiFile = require("/app/env.json");
+let apiFile = require("../env.json");
 let { Pool } = require("pg");
 let pool = new Pool(apiFile.db);
 let apiKey = apiFile["api_key"];
@@ -32,10 +32,12 @@ app.use(session({
 }));
 
 app.get("/", (req, res) => {
-  console.log("Sending login.html");
-  res.sendFile("public/login.html", { root: __dirname });
+  res.redirect("/login");
 });
 
+app.get("/login", (req, res) => {
+  res.sendFile("public/login.html", { root: __dirname });
+});
 
 app.get("/getManifest", (req, res) => {
   let rover = req.query.rover;
@@ -52,7 +54,10 @@ app.get("/getManifest", (req, res) => {
 });
 
 app.get("/", (req, res) => {
-  console.log("Sending login.html");
+  res.sendFile("public/login.html", { root: __dirname });
+});
+
+app.get("/login", (req, res) => {
   res.sendFile("public/login.html", { root: __dirname });
 });
 
@@ -88,6 +93,14 @@ app.get("/getVotedDay", (req, res) => {
     let errorCode = parseInt(error.status);
     res.status(errorCode).json({"error":error.message});
   });
+});
+
+app.get('/home', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'home.html'));
+});
+
+app.get('/createAccount', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'createAcc.html'));
 });
 
 app.post("/createAccount", async (req, res) => {

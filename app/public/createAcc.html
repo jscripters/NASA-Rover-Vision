@@ -1,30 +1,42 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-	<meta charset="utf-8">
-	<title>NASA rover vison</title>
-	<link rel="stylesheet" type="text/css" href="style.css">
+  <meta charset="utf-8" />
+  <title>NASA Rover Vision | Create Account</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="https://unpkg.com/boxicons@latest/css/boxicons.min.css" />
+  <link rel="stylesheet" href="auth.css" />
 </head>
-<body>
+<body class="login-page">
+  <div class="overlay">
+    <div class="login_box">
+      <div class="login-header">
+        <span>Create Account</span>
+      </div>
+      <form id="createAccountForm" autocomplete="off">
+        <!-- dummy fields to trick autofill -->
+        <input type="text" name="fakeusernameremembered" style="display:none">
+        <input type="password" name="fakepasswordremembered" style="display:none">
+        <div class="input_box">
+          <label for="username">Pick a username:</label>
+          <input id="username" type="text" name="username" required />
+          <i class="bx bx-user icon"></i>
+        </div>
+        <div class="input_box">
+          <label for="password">Create password:</label>
+          <input id="password" type="password" name="password" required />
+          <i class="bx bx-lock-alt icon"></i>
+        </div>
+        <div class="input_box">
+          <input type="submit" id="submit" class="input-submit" value="Create" />
+        </div>
+      </form>
+      <div class="register">
+        <span>Have an account already? <a href="/login">Login</a></span>
+      </div>
+    </div>
+  </div>
 
-<div class="form">
-	<h1>Nasa Rover Vision</h1>
-	<h2>Create Account</h2>
-
-	<div>
-		<label for="username">Pick a username:</label>
-		<input id="username" type="text" name="username" required>
-	</div>
-	<div>
-		<label for="password">Create password:</label>
-		<input id="password" type="password" name="password" required>
-	</div>
-	<button id="submit">Create</button>
-	<p><a href="login.html">Have an account already?</a></p>
-</div>
-
-
-<script src="createAcc.js"></script>
-
+  <script src="createAcc.js"></script>
 </body>
 </html>

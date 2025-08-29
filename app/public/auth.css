@@ -1,0 +1,122 @@
+/* auth.css */
+
+/* Reset and base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  height: 100vh;
+  background: url('images/n7CYgJw4nijqUgSKdtm9aW.jpg') no-repeat center center fixed;
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+}
+
+.overlay {
+  background-color: rgba(0, 0, 0, 0.7);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login_box {
+  max-width: 400px;
+  width: 100%;
+  background-color: rgba(25, 25, 25, 0.85);
+  border-radius: 8px;
+  padding: 40px 30px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+.login-header span {
+  display: block;
+  text-align: center;
+  font-size: 26px;
+  margin-bottom: 30px;
+  font-weight: 600;
+  color: #ddd;
+  letter-spacing: 1px;
+}
+
+.input_box {
+  position: relative;
+  margin-bottom: 25px;
+}
+
+.input_box label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+  color: #ccc;
+}
+
+.input_box input[type="text"],
+.input_box input[type="password"] {
+  width: 100%;
+  padding: 10px 35px 10px 10px;
+  border: 1px solid #555;
+  border-radius: 4px;
+  background: #222;
+  color: #eee;
+  transition: border-color 0.3s ease;
+}
+
+.input_box input[type="text"]:focus,
+.input_box input[type="password"]:focus {
+  outline: none;
+  border-color: #999;
+}
+
+.input_box .icon {
+  position: absolute;
+  right: 10px;
+  top: 36px;
+  color: #666;
+  pointer-events: none;
+}
+
+.input_box .input-submit {
+  width: 100%;
+  padding: 12px;
+  background: #444;
+  color: #eee;
+  border: none;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.input_box .input-submit:hover {
+  background: #666;
+}
+
+.register {
+  text-align: center;
+  margin-top: 15px;
+  font-size: 14px;
+  color: #bbb;
+}
+
+.register a {
+  color: #ddd;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.register a:hover {
+  text-decoration: underline;
+  color: #fff;
+}
+
+.remember-forgot {
+  margin-bottom: 15px; /* Increase space below Remember me */
+}

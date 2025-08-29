@@ -1,32 +1,39 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="utf-8">
-	<title>NASA rover vision</title>
-	<link rel="stylesheet" type="text/css" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="https://unpkg.com/boxicons@latest/css/boxicons.min.css" />
+  <link rel="stylesheet" href="auth.css" />
+  <title>NASA Rover Vision | Login</title>
 </head>
-<body>
+<body class="login-page">
+  <div class="overlay">
+    <div class="login_box">
+      <div class="login-header">
+        <span>Login</span>
+      </div>
+      <form id="loginForm" autocomplete="off">
+        <div class="input_box">
+          <label for="username">Username:</label>
+          <input id="username" type="text" name="no_autofill_username" autocomplete="off" required />
+          <i class="bx bx-user icon"></i>
+        </div>
+        <div class="input_box">
+          <label for="password">Password:</label>
+          <input id="password" type="password" name="no_autofill_password" autocomplete="new-password" required />
+          <i class="bx bx-lock-alt icon"></i>
+        </div>
+        <div class="input_box">
+          <input type="submit" id="submit" class="input-submit" value="Login" />
+        </div>
+      </form>
+      <div class="register">
+        <span>Don't have an account? <a href="/createAccount">Register</a></span>
+      </div>
+    </div>
+  </div>
 
-<div class="container">
-	<h1>Nasa Rover Vision</h1>
-
-	<h2>Login</h2>
-
-<div class="form">
-	<div>
-		<label for="username">Username:</label>
-		<input id="username" type="text" name="username">
-	</div>
-	<div>
-		<label for="password">Password:</label>
-		<input id="password" type="password" name="password">
-	</div>
-	<button id="submit">Login</button>
-</div>
-
-<p><a href="createAcc.html">Create account here</a></p>
-
-<script src="login.js"></script>
-
+  <script src="login.js"></script>
 </body>
 </html>

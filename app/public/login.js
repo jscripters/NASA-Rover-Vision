@@ -1,11 +1,19 @@
-let button = document.getElementById("submit");
-
-button.addEventListener("click", login);
+document.addEventListener("DOMContentLoaded", () => {
+  const submitButton = document.getElementById("submit");
+  submitButton.addEventListener("click", function(event) {
+    event.preventDefault();
+    login();
+  });
+});
 
 function login(){
-
     let usn = document.getElementById("username").value;
     let pwd = document.getElementById("password").value;
+
+    if (!usn || !pwd) {
+        alert("Please enter username and password.");
+        return;
+    }
 
     fetch('/login', {
         method: 'POST',
@@ -19,15 +27,14 @@ function login(){
     })
     .then(response => response.json())
     .then(data => {
-        console.log(data);
         if (data.message === "Login successful.") {
             sessionStorage.setItem('username', usn);
-            window.location.href = "roverCam.html";
+            window.location.href = "/home";
         } else {
             alert("Login failed: " + (data.error || "Unknown error"));
         }
     })
     .catch(error => {
-        console.error(error);
+        alert("An error occurred. Please try again.");
     });
 }

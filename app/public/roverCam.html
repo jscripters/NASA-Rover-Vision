@@ -28,10 +28,10 @@
       <label for="rover">Rover:</label>
       <select id="rover" name="rover">
         <option value="">Please select a rover</option>
-        <option value="curiosity">Curiosity</option>
-        <option value="opportunity">Opportunity</option>
-        <option value="spirit">Spirit</option>
         <option value="perseverance">Perseverance</option>
+        <option value="curiosity">Curiosity</option>
+        <option value="opportunity">Opportunity (Inactive)</option>
+        <option value="spirit">Spirit (Inactive)</option>
       </select>
 
       <label for="day">Sol day</label>
@@ -39,8 +39,11 @@
 
       <button id="getCams" aria-label="Get available cameras for selected rover and day">Get available cameras</button>
 
-      <label for="camera">Available Cameras:</label>
-      <select id="camera" name="camera"></select>
+      <div id = "cameraSelect">
+        <label for="camera">Available Cameras:</label>
+        <select id="camera" name="camera"></select>
+      </div>
+    
 
       <button id="submit" aria-label="Submit rover and camera selection">submit</button>
     </div>

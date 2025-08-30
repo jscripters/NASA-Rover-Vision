@@ -78,7 +78,7 @@ body {
   left: clamp(15px, 1.2vw, 24px);
   right: calc(
     clamp(12px, 1.2vw, 24px) 
-    + clamp(200px, 8vw, 420px) 
+    + clamp(240px, 8vw, 420px) 
     + clamp(12px, 1.2vw, 24px)
   );
   display: flex;

@@ -172,3 +172,7 @@ body {
     width: clamp(200px, 24vw, 320px);
   }
 }
+
+#speedRange {
+  direction: rtl; 
+}

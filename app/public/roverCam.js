@@ -30,10 +30,14 @@ let nextButton = document.getElementById("next");
 let prevButton = document.getElementById("previous");
 let timelapseButton = document.getElementById("timelapse");
 let pauseButton   = document.getElementById("pause-main");
+let cameraSelect = document.getElementById("cameraSelect");
 let cameraOptions = document.getElementById("camera");
-let errsMsg = document.getElementById("errors");
+let generalMsg = document.getElementById("errors");
 let slider  = document.getElementById("speedRange");
 let speed = slider.value;
+
+cameraSelect.hidden = true;
+button.hidden=true;
 
 let recContainer = document.getElementById("add");
 function addDayToRecTable(day) {
@@ -71,7 +75,7 @@ let currentSrc = 0;
 let isIntervalOn = false;
 let interval;
 
-function timelaspe() {
+function timelapse() {
   if(isIntervalOn == false){
     interval = setInterval(function () {
       getNextPhotos();
@@ -87,8 +91,8 @@ function stopInterval() {
 
 function getNextPhotos() {
   if (currentSrc < photosArr.length) {
-    images.src = photosArr[currentSrc];
     currentSrc += 1;
+    images.src = photosArr[currentSrc];
   } else {
     currentSrc = 0;
   }
@@ -96,8 +100,8 @@ function getNextPhotos() {
 
 function getPrevPhotos() {
   if (currentSrc > 0) {
-    images.src = photosArr[currentSrc];
     currentSrc -= 1;
+    images.src = photosArr[currentSrc];
   } else {
     currentSrc = 0;
   }
@@ -108,23 +112,27 @@ function submit(srcArr) {
   let dayInput = document.getElementById("day").value;
   let roverInput = document.getElementById("rover").value;
   let cameraInput = document.getElementById("camera").value;
-  let url = `/getPhotos?solday=${dayInput}&camera=${cameraInput}&rover=${roverInput}`;
-  fetch(url).then((response) => response.json())
-    .then((body) => {
-      let maxLen = body.photos.length;
-      console.log(body)
-      for (let i = 0; i < maxLen; i++) {
-        const imageSource = body.photos[i].img_src.toString();
-        srcArr.push(imageSource);
-      }
-      if (srcArr.length > 0) {
-        errsMsg.textContent=`There are ${maxLen} photos here`;
-        images.src = body.photos[0].img_src.toString();
-      }
-      else{
-        errsMsg.textContent="There are no photos from this camera, please choose another";
-      }
-    }).catch(error => console.log(error));
+  if(cameraInput == ""){
+    generalMsg.textContent = "please select a camera";
+  }else{
+    let url = `/getPhotos?solday=${dayInput}&camera=${cameraInput}&rover=${roverInput}`;
+    fetch(url).then((response) => response.json())
+      .then((body) => {
+        let maxLen = body.photos.length;
+        console.log(body)
+        for (let i = 0; i < maxLen; i++) {
+          const imageSource = body.photos[i].img_src.toString();
+          srcArr.push(imageSource);
+        }
+        if (srcArr.length > 0) {
+          generalMsg.textContent=`There are ${maxLen} photos here\nPhotos taken on ${body.photos[0].earth_date}`;
+          images.src = body.photos[0].img_src.toString();
+        }
+        else{
+          generalMsg.textContent="There are no photos from this camera, please choose another";
+        }
+      }).catch(error => console.log(error));
+  }
 }
 
 function nextButtonClicked() {
@@ -143,7 +151,7 @@ let roverName = document.getElementById("rovername");
 roverInput.addEventListener('change', () => {
   availableCams = {};
   recContainer.textContent = "";
-  roverName.textContent = roverInput.value.charAt(0).toUpperCase() + roverInput.value.slice(1) + " Available Sol Days";
+  roverName.textContent = roverInput.value.charAt(0).toUpperCase() + roverInput.value.slice(1) + "Recommended Sol Days";
   getManifest(availableCams, roverInput.value);
 });
 
@@ -160,6 +168,8 @@ getCams.addEventListener("click", () => {
   } else {
     console.log("Error: input day and rover");
   }
+  cameraSelect.hidden = false;
+  button.hidden = false;
 });
 
 function nextButtonClicked() {
@@ -175,7 +185,7 @@ function prevButtonClicked() {
 let photosArr = [];
 let firstClick = true;
 function submitClick() {
-  errsMsg.textContent = "";
+  generalMsg.textContent = "";
   if (!firstClick) {
     photosArr = [];
     currentSrc = 0;
@@ -188,13 +198,13 @@ button.addEventListener("click", submitClick);
 nextButton.addEventListener("click", nextButtonClicked);
 prevButton.addEventListener("click", prevButtonClicked);
 pauseButton.addEventListener("click", stopInterval);
-timelapseButton.addEventListener("click", timelaspe);
+timelapseButton.addEventListener("click", timelapse);
 slider.addEventListener('input', function() {
   speed = parseInt(this.value);
   //console.log("speed",speed)
   if(isIntervalOn){
     stopInterval()
-    timelaspe()
+    timelapse()
   }
 
 });

@@ -102,8 +102,7 @@ app.get('/createAccount', (req, res) => {
 
 app.post("/createAccount", async (req, res) => {
 
-  const username = req.query.username;
-  const password = req.query.password;
+  const { username, password } = req.body;
 
   if (!username || !password) {
     return res.status(400).json({ error: "Username and password required." });

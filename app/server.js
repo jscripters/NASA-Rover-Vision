@@ -20,16 +20,14 @@ const server = createServer(app);
 
 startSocketConnection(server);
 
-
-app.use(express.static("public"));
-app.use(express.json());
-
 app.use(session({
   secret: 'jscripters2025',
   resave: false,
   saveUninitialized: false,
   cookie: { secure: false }
 }));
+
+app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/", (req, res) => {
   res.redirect("/login");
@@ -121,6 +119,10 @@ app.post("/createAccount", async (req, res) => {
       "INSERT INTO users (username, passwords) VALUES ($1, $2) RETURNING id",
       [username, hashedPassword]
     );
+
+    req.session.userId = result.rows[0].id;
+    req.session.username = username;
+
     res.json({ message: "Account created successfully." });
   } catch (error) {
     if (error.code === '23505') {

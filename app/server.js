@@ -125,6 +125,7 @@ app.post("/createAccount", async (req, res) => {
     req.session.userId = result.rows[0].id;
     req.session.username = username;
 
+    window.location.href = "/home.html"; 
     res.json({ message: "Account created successfully." });
   } catch (error) {
     if (error.code === '23505') {

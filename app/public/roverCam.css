@@ -41,8 +41,8 @@ body {
 .recommendations {
   position: fixed;
   top: clamp(56px, 7vh, 72px);
-  right: clamp(12px, 1.2vw, 24px);
-  width: clamp(180px, 8vw, 420px);
+  right: 1.24vw;
+  width: 6vw;
   background: rgba(31, 30, 30, 0.8);
   color: #fff;
   padding: clamp(8px, 1vh, 16px) clamp(10px, 1.2vw, 18px);
@@ -56,8 +56,8 @@ body {
 .msg {
   position: fixed;
   top: 60vh;
-  right: clamp(12px, 1.2vw, 24px);
-  width: clamp(180px, 8vw, 420px);
+  right: 1.24vw;
+  width: 6vw;
   background: rgba(31, 30, 30, 0.8);
   color: #fff;
   padding: clamp(8px, 1vh, 16px) clamp(10px, 1.2vw, 18px);

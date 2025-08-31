@@ -53,13 +53,6 @@ app.get("/getManifest", (req, res) => {
   console.log(`Sending request to: ${baseUrl}manifests/${rover}`);
 });
 
-app.get("/", (req, res) => {
-  res.sendFile("public/login.html", { root: __dirname });
-});
-
-app.get("/login", (req, res) => {
-  res.sendFile("public/login.html", { root: __dirname });
-});
 
 app.get("/introduction", (req, res) => {
   res.sendFile("public/introduction.html", { root: __dirname });

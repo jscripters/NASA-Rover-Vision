@@ -75,13 +75,8 @@ body {
 #input {
   position: fixed;
   top: clamp(56px, 7vh, 72px);
-  left: clamp(15px, 1.2vw, 24px);
-  right: calc(
-    clamp(12px, 1.2vw, 24px) 
-    + clamp(240px, 8vw, 420px) 
-    + clamp(12px, 1.2vw, 24px)
-  );
-  display: flex;
+  left: clamp(12px, 1.2vw, 24px);
+  display: inline-flex;  
   flex-wrap: wrap;
   gap: clamp(8px, 1vh, 16px) clamp(8px, 1vw, 16px);
   align-items: center;
@@ -91,7 +86,10 @@ body {
   padding: clamp(8px, 1vh, 16px) clamp(10px, 1.2vw, 18px);
   border-radius: clamp(8px, 0.8vw, 12px);
   z-index: 2;
+  width: auto;             
+  max-width: none;          
 }
+
 
 #input label {
   margin-right: clamp(4px, 0.3vw, 8px);

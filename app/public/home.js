@@ -5,6 +5,13 @@ if (!userIdRaw) {
 }
 
 userId = userIdRaw.trim();
+let welcomeBanner = document.getElementById("welcome");
+welcomeBanner.innerHTML += `, ${userId}!`;
+
+function logout() {
+  sessionStorage.removeItem('username');
+  window.location.href = 'login.html';
+}
 
 const socket = io({
   auth: {

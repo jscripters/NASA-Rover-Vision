@@ -69,6 +69,10 @@ app.get("/roverCam", (req, res) => {
   res.sendFile("public/roverCam.html", { root: __dirname });
 });
 
+app.get("/community", (req, res) => {
+  res.sendFile("public/findings.html", { root: __dirname });
+});
+
 app.get("/getPhotos", (req, res) => {
   let rover = req.query.rover;
   let solDay = req.query.solday;
@@ -85,10 +89,10 @@ app.get("/getPhotos", (req, res) => {
 });
 
 app.get("/getVotedDay", (req, res) => {
-  let test = getResult();
+  let resultDetails = getResult();
   let url = `${baseUrl}rovers/${"curiosity"}/photos?sol=${950}&camera=${"navcam"}&api_key=${apiKey}`;
-  if(test != undefined){
-    url = `${baseUrl}rovers/${test.rover}/photos?sol=${test.day}&camera=${test.camera}&api_key=${apiKey}`
+  if(resultDetails != undefined){
+    url = `${baseUrl}rovers/${resultDetails.rover}/photos?sol=${resultDetails.day}&camera=${resultDetails.camera}&api_key=${apiKey}`
   }
   axios.get(url).then((response) => {
     res.json(response.data);

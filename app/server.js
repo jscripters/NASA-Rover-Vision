@@ -118,14 +118,13 @@ app.post("/createAccount", async (req, res) => {
     req.session.userId = result.rows[0].id;
     req.session.username = username;
 
-    window.location.href = "/home.html"; 
     res.json({ message: "Account created successfully." });
   } catch (error) {
     if (error.code === '23505') {
       res.status(409).json({ error: "Username already exists." });
     } else {
       console.error(error);
-      res.status(500).json({ error: "Internal server error." });
+      res.status(500).json({ error: "Internal server error: " + (error.message || "Unknown error" )});
     }
   }
 });

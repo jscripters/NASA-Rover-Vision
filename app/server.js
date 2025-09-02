@@ -3,7 +3,7 @@ let express = require("express");
 let session = require('express-session');
 let bcrypt = require('bcrypt');
 let app = express();
-let apiFile = require("../env.json");
+let apiFile = require("../project/env.json");
 let { Pool } = require("pg");
 let pool = new Pool(apiFile.db);
 let apiKey = apiFile["api_key"];
@@ -106,6 +106,38 @@ app.get('/home', (req, res) => {
 app.get('/createAccount', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'createAcc.html'));
 });
+
+let posts = [];
+app.post("/findings", async (req, res) => {
+  console.log("request is:",req.body);
+  posts.push(req.body)
+  try {
+    let result = await pool.query(
+      `INSERT INTO posts (username, descriptions, parameters,imageSources) VALUES ($1, $2, $3, $4) RETURNING *`,
+      [req.body.username, req.body.desc, req.body.parameters, req.body.imageSrcs]
+    );
+  } catch (error) {
+    console.error('error:', error);
+    res.status(500).json({ error: error.message });
+  }
+
+});
+
+app.get("/findings", async (req, res) => {
+  console.log("response2 is:",posts);
+  try {
+    const result = await pool.query(
+      'SELECT * FROM posts'
+    );
+    console.log("retrived from post:",result.rows);
+    //res.json({ message: 'Login successful.' });
+    //res.json(posts)
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: 'retrieval failed.' });
+  }
+});
+
 
 app.post("/createAccount", async (req, res) => {
 

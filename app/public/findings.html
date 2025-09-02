@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Nasa Rover Vision</title>
+  <link rel="stylesheet" type="text/css" href="css/canvas.css">
+  <style>
+    html, body { margin: 0; padding: 0; height: 100%; }
+    body {background-color: rgb(0, 0, 0); overflow-x: hidden; font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
+
+    /* Top banner */
+    .banner {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 60px;
+      margin: 0;
+      background-color: rgb(11, 61, 145);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      z-index: 2;
+    }
+
+    div {
+        border: 1px solid rgb(255, 255, 255);
+        color: #fff;
+    }
+
+    img {
+      width: 300px;
+      height: 200px;
+    }
+
+
+
+    #postBox {
+        display: grid;
+        place-items: center; /* Centers both horizontally and vertically */
+    }
+
+    #showcase {
+        display: grid;
+        place-items: center; /* Centers both horizontally and vertically */
+    }
+  </style>
+  <script src="findings.js" defer></script>
+</head>
+<body>
+
+  <h1 class="banner">Welcome to NASA Rover Vision</h1>
+
+  <div id="showcase">
+    <img id="photos" src="images/login-page-background.jpg" width="350" height="250">
+    <div style="color: #fff;">Community voted sol day</div>
+  </div>
+
+  <div id ="postBox">Community finds and posts
+  </div>
+</body>
+</html>

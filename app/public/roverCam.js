@@ -33,11 +33,14 @@ let pauseButton   = document.getElementById("pause-main");
 let cameraSelect = document.getElementById("cameraSelect");
 let cameraOptions = document.getElementById("camera");
 let generalMsg = document.getElementById("errors");
+let postFinding = document.getElementById("findingDesc");
 let slider  = document.getElementById("speedRange");
 let speed = slider.value;
+let descSubmit = document.getElementById("desc-submit");
 
 cameraSelect.hidden = true;
 button.hidden=true;
+//postFinding.hidden = true;
 
 let recContainer = document.getElementById("add");
 function addDayToRecTable(day) {
@@ -92,18 +95,20 @@ function stopInterval() {
 function getNextPhotos() {
   if (currentSrc < photosArr.length) {
     currentSrc += 1;
+    if(photosArr[currentSrc] == undefined){
+      currentSrc=0;
+    }
     images.src = photosArr[currentSrc];
-  } else {
-    currentSrc = 0;
   }
 }
 
 function getPrevPhotos() {
   if (currentSrc > 0) {
     currentSrc -= 1;
+    if(photosArr[currentSrc] == undefined){
+      currentSrc=0;
+    }
     images.src = photosArr[currentSrc];
-  } else {
-    currentSrc = 0;
   }
 }
 
@@ -119,7 +124,7 @@ function submit(srcArr) {
     fetch(url).then((response) => response.json())
       .then((body) => {
         let maxLen = body.photos.length;
-        console.log(body)
+        //console.log(body)
         for (let i = 0; i < maxLen; i++) {
           const imageSource = body.photos[i].img_src.toString();
           srcArr.push(imageSource);
@@ -131,8 +136,37 @@ function submit(srcArr) {
         else{
           generalMsg.textContent="There are no photos from this camera, please choose another";
         }
+        //postFinding.hidden= false;
       }).catch(error => console.log(error));
   }
+}
+
+function send_finding(imgArr){
+  let desc = document.getElementById("desc-input").value;
+  let dayInput = document.getElementById("day").value;
+  let roverInput = document.getElementById("rover").value;
+  let cameraInput = document.getElementById("camera").value;
+  fetch('/findings', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            username: userId,
+            desc: desc,
+            parameters:{
+              day: dayInput,
+              rover: roverInput,
+              camera: cameraInput},
+            imageSrcs: imgArr
+        })
+    })
+    .then(response => {
+      console.log(response.body)
+    })
+    .catch(error => {
+       console.log("An error occurred. Please try again.");
+    });
 }
 
 function nextButtonClicked() {
@@ -208,6 +242,9 @@ slider.addEventListener('input', function() {
   }
 
 });
+descSubmit.addEventListener("click", (e)=>{
+  e.preventDefault()
+  send_finding(photosArr)})
 
 function hashStringToInt(str) {
   const p = 31;

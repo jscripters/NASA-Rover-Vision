@@ -49,14 +49,20 @@
     </div>
 
     <div id="controls">
-      <button id="previous" aria-label="Previous image">prev</button>
-      <button id="next" aria-label="Next image">next</button>
-      <button id="timelapse" aria-label="Start timelapse">timelapse</button>
-      <button id="pause-main" aria-label="Pause playback">pause</button>
-      <button id="vote" class="hidden" aria-label="Vote button">vote</button>
+      <button id="previous" aria-label="Previous image">Prev</button>
+      <button id="next" aria-label="Next image">Next</button>
+      <button id="timelapse" aria-label="Start timelapse">Timelapse</button>
+      <button id="pause-main" aria-label="Pause playback">Pause</button>
+      <button id="vote" class="hidden" aria-label="Vote button">Vote</button>
       <div class="speed-control">
         <label for="speedRange">Speed:</label>
         <input type="range" min="100" max="1000" value="700" id="speedRange">
+      </div>
+      <div id="findingDesc">
+        <form id="desc-form">
+          <input id="desc-input" type="text" placeholder="what did you find?">
+          <button id="desc-submit" aria-label="Send finding">Post Finding</button>
+        </form>
       </div>
     </div>
 

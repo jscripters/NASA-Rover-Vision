@@ -168,7 +168,7 @@ function send_finding(imgArr){
     .catch(error => {
        console.log("An error occurred. Please try again.");
     });
-    
+
   }
   else{
     generalMsg.textContent = "please enter a description";
@@ -290,20 +290,32 @@ function voteButtonClicked() {
   const cameraValue = document.getElementById("camera").value;
 
   if (!dayValue || !roverValue || !cameraValue) {
+    alert("Incomplete vote received, ignoring");
     return;
   }
 
   const voteData = {userId, dayValue, roverValue, cameraValue};
 
-  socket.emit('userVote', voteData, (response) => {
-    if (response.success) {
+  socket.timeout(10000).emit(
+  'userVote',
+  voteData,
+  (err, response) => {
+    if (err) {
+      console.warn("Ack timeout or error:", err);
+      return;
+    }
+
+    if (response && response.success) {
       voteButton.disabled = true;
       voteButton.classList.add('hidden');
     } else {
+      console.log("Server response:", response);
       voteButton.disabled = false;
       voteButton.classList.remove('hidden');
     }
-  });
+  }
+);
+
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -319,7 +331,21 @@ document.addEventListener('DOMContentLoaded', function() {
     if (input.value) {
       const clientOffset = `${socket.id}-${counter++}`;
       const timeStamp = new Date().toISOString();
-      socket.emit('chat message', userId, input.value, clientOffset, timeStamp, acknowledgementCallback);
+      socket.timeout(10000).emit(
+        'chat message',
+        userId,
+        input.value,
+        clientOffset,
+        timeStamp,
+        (err, response) => {
+          if (err) {
+            // TODO: implement retry or alert user
+            console.log('Ack not received within 10 seconds');
+          } else {
+            console.log('Ack received:', response);
+          }
+        }
+      );
       input.value = '';
     }
   });
@@ -363,15 +389,6 @@ document.addEventListener('DOMContentLoaded', function() {
     isPollActive = false;
   });
 });
-
-function acknowledgementCallback(ack) {
-  console.log('Ack received:', ack);
-  if (ack && ack.success) {
-    console.log('Acknowledged: stop retrying');
-  } else {
-    console.error('Acknowledgment failed, will retry...');
-  }
-}
 
 function updatePollTimer() {
   const minutes = Math.floor(pollDuration / 60);

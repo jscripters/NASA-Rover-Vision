@@ -28,7 +28,7 @@ async function setupSocket(server) {
   await db.exec(`
     CREATE TABLE IF NOT EXISTS messages (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT,
+        userId TEXT,
         client_offset TEXT UNIQUE,
         content TEXT,
         timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -56,7 +56,7 @@ async function setupSocket(server) {
         );
 
         recentMessages.forEach(row => {
-          socket.emit('chat message', row.username, row.content, row.id);
+          socket.emit('chat message', row.userId, row.content, row.id);
         });
 
       } catch (e) {
@@ -74,30 +74,52 @@ async function setupSocket(server) {
       socket.emit("pollClosed", getTimeUntilNextPoll());
     }
 
-    socket.on('chat message', async (username, msg, client_offset, timeStamp, callback) => {
-      let result;
-      try {
-        result = await db.run('INSERT INTO messages (username, content, client_offset, timestamp) VALUES (?, ?, ?, ?)', username, msg, client_offset, timeStamp);
-      } catch (e) {
-        if (e.errno === 19) {
-          callback({ success: false, error: e.message });
-        } else {
-          console.error(e);
-          callback({ success: false, error: 'An error occurred' });
-        }
-        return;
+    socket.on('chat message', async (userId, msg, client_offset, timeStamp, ack) => {
+    if (!userId || !msg || !client_offset || !timeStamp) {
+      console.warn('Missing one or more parameters:', { userId, msg, client_offset, timeStamp });
+      if (typeof ack === 'function') {
+        ack({ success: false, error: 'Invalid parameters received' });
       }
-      io.emit('chat message', username, msg, result.lastID);
-      callback({ success: true });
-    });
+      return;
+    }
 
-    socket.on('userVote', async (voteData, callback) => {
+    try {
+      const result = await db.run(
+        'INSERT INTO messages (userId, content, client_offset, timestamp) VALUES (?, ?, ?, ?)',
+        userId, msg, client_offset, timeStamp
+      );
+      io.emit('chat message', userId, msg, result.lastID);
+
+      if (typeof ack === 'function') {
+        ack({ success: true });
+      }
+    } catch (e) {
+      if (e.errno === 19) { // UNIQUE constraint failed
+        console.log('Duplicate message. Sending failure ack');
+        if (typeof ack === 'function') {
+          ack({ success: false, error: 'Duplicate message' });
+        }
+      } else {
+        console.error('DB error:', e);
+        if (typeof ack === 'function') {
+          ack({ success: false, error: 'Server error' });
+        }
+      }
+    }
+  });
+
+
+    socket.on('userVote', async (voteData, ack) => {
+      if (typeof ack !== 'function') {
+        ack = () => {};
+      }
+
       try {
         const { userId, dayValue, roverValue, cameraValue } = voteData;
 
         if (!userId || !dayValue || !roverValue || !cameraValue) {
           console.warn("Incomplete vote received, ignoring:", voteData);
-          return;
+          return ack({ success: false, error: 'Missing vote parameters' });
         }
 
         const userVoteRecord = await db.get(
@@ -106,7 +128,7 @@ async function setupSocket(server) {
         );
 
         if (userVoteRecord) {
-          return callback({ success: false, error: 'User has already voted' });
+          return ack({ success: false, error: 'User has already voted' });
         }
 
         await db.run(
@@ -114,10 +136,11 @@ async function setupSocket(server) {
           [userId, dayValue, roverValue, cameraValue]
         );
 
-        return callback({ success: true });
+        return ack({ success: true });
 
       } catch (err) {
-        return callback({ success: false, error: 'Database error' });
+        console.error('Vote DB error:', err);
+        return ack({ success: false, error: 'Database error' });
       }
     });
 
@@ -170,7 +193,7 @@ async function getPollWinner(tableName, columnName , day, cameraName) {
 
 async function startVotingCycle() {
   while (true) {
-    await startVotingSession(1 * 60 * 1000);
+    await startVotingSession(1 * 60 * 10000);
     await new Promise(resolve => setTimeout(resolve, 10 * 60 * 1000));
   }
 }

@@ -16,8 +16,11 @@ function timelaspe() {
 
 function getNextPhotos() {
   if (currentSrc < srcArr.length) {
-    images.src = srcArr[currentSrc];
     currentSrc += 1;
+    if(srcArr[currentSrc] == undefined){
+        currentSrc=0;
+    }
+    images.src = srcArr[currentSrc];
   } else {
     currentSrc = 0;
   }

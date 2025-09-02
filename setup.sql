@@ -3,3 +3,10 @@ CREATE TABLE IF NOT EXISTS users (
 	username VARCHAR(20) UNIQUE NOT NULL,
 	passwords VARCHAR(255) NOT NULL
 );
+CREATE TABLE IF NOT EXISTS posts (
+	id SERIAL PRIMARY KEY,
+	username VARCHAR(20),
+	descriptions TEXT NOT NULL,
+	parameters JSON,
+	imageSources TEXT[]
+);

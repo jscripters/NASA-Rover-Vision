@@ -62,6 +62,10 @@ app.get("/roverCam", (req, res) => {
   res.sendFile("public/roverCam.html", { root: __dirname });
 });
 
+app.get("/community", (req, res) => {
+  res.sendFile("public/findings.html", { root: __dirname });
+});
+
 app.get("/getPhotos", (req, res) => {
   let rover = req.query.rover;
   let solDay = req.query.solday;
@@ -78,10 +82,10 @@ app.get("/getPhotos", (req, res) => {
 });
 
 app.get("/getVotedDay", (req, res) => {
-  let test = getResult();
+  let resultDetails = getResult();
   let url = `${baseUrl}rovers/${"curiosity"}/photos?sol=${950}&camera=${"navcam"}&api_key=${apiKey}`;
-  if(test != undefined){
-    url = `${baseUrl}rovers/${test.rover}/photos?sol=${test.day}&camera=${test.camera}&api_key=${apiKey}`
+  if(resultDetails != undefined){
+    url = `${baseUrl}rovers/${resultDetails.rover}/photos?sol=${resultDetails.day}&camera=${resultDetails.camera}&api_key=${apiKey}`
   }
   axios.get(url).then((response) => {
     res.json(response.data);
@@ -99,6 +103,35 @@ app.get('/home', (req, res) => {
 app.get('/createAccount', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'createAcc.html'));
 });
+
+
+app.post("/findings", async (req, res) => {
+  //console.log("request is:",req.body);
+  try {
+    let result = await pool.query(
+      `INSERT INTO posts (username, descriptions, parameters,imageSources) VALUES ($1, $2, $3, $4) RETURNING *`,
+      [req.body.username, req.body.desc, req.body.parameters, req.body.imageSrcs]
+    );
+  } catch (error) {
+    console.error('error:', error);
+    res.status(500).json({ error: error.message });
+  }
+
+});
+
+app.get("/findings", async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT * FROM posts'
+    );
+    //console.log("retrived from post:",result.rows);
+    
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: 'retrieval failed.' });
+  }
+});
+
 
 app.post("/createAccount", async (req, res) => {
 

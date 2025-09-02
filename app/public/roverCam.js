@@ -146,7 +146,8 @@ function send_finding(imgArr){
   let dayInput = document.getElementById("day").value;
   let roverInput = document.getElementById("rover").value;
   let cameraInput = document.getElementById("camera").value;
-  fetch('/findings', {
+  if(desc != ""){
+    fetch('/findings', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -167,6 +168,11 @@ function send_finding(imgArr){
     .catch(error => {
        console.log("An error occurred. Please try again.");
     });
+    
+  }
+  else{
+    generalMsg.textContent = "please enter a description";
+  }
 }
 
 function nextButtonClicked() {
@@ -243,8 +249,13 @@ slider.addEventListener('input', function() {
 
 });
 descSubmit.addEventListener("click", (e)=>{
-  e.preventDefault()
-  send_finding(photosArr)})
+  e.preventDefault();
+  send_finding(photosArr);
+  const descInput = document.getElementById("desc-input");
+  if(descInput.value){
+    descInput.value = '';
+  }
+})
 
 function hashStringToInt(str) {
   const p = 31;

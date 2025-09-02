@@ -376,7 +376,6 @@ document.addEventListener('DOMContentLoaded', function() {
   socket.on('pollOpen', (allocatedTime) => {
     voteButton.disabled = false;
     voteButton.classList.remove('hidden');
-    //console.log("Poll is now open");
     pollDuration = allocatedTime;
     isPollActive = true;
   });
@@ -384,7 +383,6 @@ document.addEventListener('DOMContentLoaded', function() {
   socket.on('pollClosed', (allocatedTime) => {
     voteButton.disabled = true;
     voteButton.classList.add('hidden');
-    //console.log("Poll is now closed");
     pollDuration = allocatedTime;
     isPollActive = false;
   });

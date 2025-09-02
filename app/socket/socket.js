@@ -67,7 +67,7 @@ async function setupSocket(server) {
     if (pollActive) {
       const remaining = getTimeLeftInPoll();
       if (remaining > 0)
-        socket.emit("pollOpen", remaining / 1000);
+        socket.emit("pollOpen", remaining);
       else
         socket.emit("pollClosed", getTimeUntilNextPoll());
     } else {
@@ -153,14 +153,14 @@ async function setupSocket(server) {
 async function startVotingSession(allocatedTime) {
   pollActive = true;
   pollStartTime = Date.now();
-  pollDuration = allocatedTime;
+  pollDuration = allocatedTime * 1000; // Store in milliseconds
 
   let result = null;
 
   await db.run(`DELETE FROM votes`);
-  io.emit("pollOpen", allocatedTime / 1000);
+  io.emit("pollOpen", allocatedTime);
 
-  await new Promise(resolve => setTimeout(resolve, allocatedTime));
+  await new Promise(resolve => setTimeout(resolve, allocatedTime * 1000));
 
   pollActive = false;
   result = await getPollWinner('votes', 'rover', 'day', 'camera');
@@ -193,7 +193,7 @@ async function getPollWinner(tableName, columnName , day, cameraName) {
 
 async function startVotingCycle() {
   while (true) {
-    await startVotingSession(1 * 60 * 10000);
+    await startVotingSession(120); // 2 mins
     await new Promise(resolve => setTimeout(resolve, 10 * 60 * 1000));
   }
 }
@@ -220,7 +220,7 @@ function getTimeUntilNextPoll() {
 function getTimeLeftInPoll() {
   if (!pollActive) return null;
   const elapsed = Date.now() - pollStartTime;
-  const remaining = Math.max(0, pollDuration * 1000 - elapsed);
+  const remaining = Math.max(0, pollDuration - elapsed);
   return Math.floor(remaining / 1000);
 }
 

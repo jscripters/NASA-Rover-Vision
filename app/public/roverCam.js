@@ -191,7 +191,7 @@ let roverName = document.getElementById("rovername");
 roverInput.addEventListener('change', () => {
   availableCams = {};
   recContainer.textContent = "";
-  roverName.textContent = roverInput.value.charAt(0).toUpperCase() + roverInput.value.slice(1) + "Recommended Sol Days";
+  roverName.textContent = roverInput.value.charAt(0).toUpperCase() + roverInput.value.slice(1) + " Recommended Sol Days";
   getManifest(availableCams, roverInput.value);
 });
 
@@ -340,9 +340,9 @@ document.addEventListener('DOMContentLoaded', function() {
         (err, response) => {
           if (err) {
             // TODO: implement retry or alert user
-            console.log('Ack not received within 10 seconds');
+            //console.log('Ack not received within 10 seconds');
           } else {
-            console.log('Ack received:', response);
+            //console.log('Ack received:', response);
           }
         }
       );

@@ -4,7 +4,8 @@
   "description": "Nasa Rover Vision",
   "type": "commonjs",
   "scripts": {
-    "setup": "node setup.js && npm install",
+    "setup": "node setup.js && npm install", 
+    "setupDBs": "psql -U postgres -f setup.sql",
     "start": "cd app && node server.js"
   },
   "dependencies": {

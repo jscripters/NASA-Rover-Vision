@@ -5,7 +5,7 @@
   "type": "commonjs",
   "scripts": {
     "setup": "node setup.js && npm install", 
-    "setupDBs": "psql -U postgres -f setup.sql",
+    "setupDBs": "psql -f setup.sql",
     "start": "cd app && node server.js"
   },
   "dependencies": {

@@ -1,93 +1,89 @@
 let votedDay;
-let srcArr =[];
-let images = document.getElementById("photos");
-let currentSrc=0;
+let srcArr = [];
+const images = document.getElementById("photos");
+let currentSrc = 0;
 let interval;
+let isIntervalOn = false;
 
-isIntervalOn = false;
 function timelaspe() {
-  if(isIntervalOn == false){
-    interval = setInterval(function () {
-      getNextPhotos();
-    }, 700);
+  if (!isIntervalOn && srcArr.length) {
+    interval = setInterval(getNextPhotos, 700);
     isIntervalOn = true;
   }
 }
-
 function getNextPhotos() {
-  if (currentSrc < srcArr.length) {
-    currentSrc += 1;
-    if(srcArr[currentSrc] == undefined){
-        currentSrc=0;
-    }
-    images.src = srcArr[currentSrc];
-  } else {
-    currentSrc = 0;
-  }
+  if (!srcArr.length) return;
+  currentSrc = (currentSrc + 1) % srcArr.length;
+  images.src = srcArr[currentSrc];
 }
-
 
 function submit(photoArr) {
-  let url = `/getVotedDay`;
-  fetch(url).then((response) => response.json())
+  fetch(`/getVotedDay`)
+    .then((r) => r.json())
     .then((body) => {
-      let maxLen = body.photos.length;
-      //console.log(body)
-      for (let i = 0; i < maxLen; i++) {
-        const imageSource = body.photos[i].img_src.toString();
-        photoArr.push(imageSource);
+      const list = body?.photos || [];
+      for (let i = 0; i < list.length; i++) {
+        const imageSource = String(list[i].img_src || "");
+        if (imageSource) photoArr.push(imageSource);
       }
-      timelaspe()
-    }).catch(error => console.log(error));
+      if (photoArr.length) images.src = photoArr[0];
+      timelaspe();
+    })
+    .catch(console.error);
 }
 
-function showPosts(arr){
-    let postBox = document.getElementById("postBox");
-    for(let i = 0;i < arr.length;i++){
-        //console.log("here:",arr[i].descriptions);
-        let appendDiv = document.createElement("div");
-        let description = document.createElement("p");
-        let parameters = document.createElement("p");
-        description.textContent = arr[i].username+": "+arr[i].descriptions;
-        parameters.textContent="found on Sol day: "+ arr[i].parameters.day + ", Rover: "+ arr[i].parameters.rover+ ", Camera: "+ arr[i].parameters.camera
-        
-        //console.log(arr[i].imagesources)
-        let srcs= arr[i].imagesources;
-        let img = document.createElement("img");
-        
-        let nextButton = document.createElement("button");
-        nextButton.textContent = "next";
-        
-        postBox.append(appendDiv);
-        appendDiv.append(description);
-        appendDiv.append(parameters);
-        appendDiv.append(img);
-        appendDiv.append(nextButton);
-        let currentIdx = 0;
-        img.src = srcs[currentIdx]
-        nextButton.addEventListener("click",(e)=>{
-            if(currentIdx < srcs.length){
-                currentIdx+=1
-                if(srcs[currentIdx] == undefined){
-                    currentIdx=0;
-                }
-                img.src = srcs[currentIdx];
-            }else{
-                currentIdx=0
-            }
-        });
-    }
-    
+function showPosts(arr) {
+  const postBox = document.getElementById("postBox");
+  postBox.setAttribute("aria-busy", "true");
+
+  for (let i = 0; i < arr.length; i++) {
+    const post = document.createElement("div");
+    post.className = "post";
+
+    const description = document.createElement("p");
+    description.textContent = `${arr[i].username}: ${arr[i].descriptions}`;
+    description.className = "clamp-2";
+
+    const parameters = document.createElement("p");
+    parameters.className = "meta";
+    parameters.textContent =
+      `found on Sol day: ${arr[i].parameters.day}, ` +
+      `Rover: ${arr[i].parameters.rover}, ` +
+      `Camera: ${arr[i].parameters.camera}`;
+
+    const img = document.createElement("img");
+    img.alt = "rover photo";
+
+    const hr = document.createElement("div");
+    hr.className = "hr";
+
+    const nextButton = document.createElement("button");
+    nextButton.textContent = "next";
+    nextButton.className = "btn";
+
+    post.append(description, parameters, img, hr, nextButton);
+    postBox.append(post);
+
+    const srcs = Array.isArray(arr[i].imagesources) ? arr[i].imagesources : [];
+    let currentIdx = 0;
+    if (srcs.length) img.src = srcs[0];
+
+    nextButton.addEventListener("click", () => {
+      if (!srcs.length) return;
+      currentIdx = (currentIdx + 1) % srcs.length;
+      img.src = srcs[currentIdx];
+    });
+  }
+
+  postBox.setAttribute("aria-busy", "false");
 }
 
 function getPosts() {
-  let url = `/findings`;
-  fetch(url).then((response) => response.json())
-    .then((body) => {
-      //console.log("data retreived",body)
-      showPosts(body);
-    }).catch(error => console.log(error));
+  fetch(`/findings`)
+    .then((r) => r.json())
+    .then((body) => showPosts(body || []))
+    .catch(console.error);
 }
 
-submit(srcArr)
+submit(srcArr);
 getPosts();

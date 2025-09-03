@@ -40,7 +40,7 @@ let descSubmit = document.getElementById("desc-submit");
 
 cameraSelect.hidden = true;
 button.hidden=true;
-//postFinding.hidden = true;
+postFinding.hidden = true;
 
 let recContainer = document.getElementById("add");
 function addDayToRecTable(day) {
@@ -136,7 +136,7 @@ function submit(srcArr) {
         else{
           generalMsg.textContent="There are no photos from this camera, please choose another";
         }
-        //postFinding.hidden= false;
+        postFinding.hidden= false;
       }).catch(error => console.log(error));
   }
 }
